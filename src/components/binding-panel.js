@@ -137,6 +137,7 @@ function writeBindings(
 	const metadata = {
 		...prevMeta,
 		dmf: {
+			...( prevMeta.daiDmf || {} ),
 			...( prevMeta.dmf || {} ),
 			hideIfEmpty: !! hideIfEmpty,
 		},
@@ -329,6 +330,9 @@ function BindingPanel( {
 
 	const [ scfContext, setScfContext ] = useState( 'post' );
 	const [ fields, setFields ] = useState( [] );
+	const [ taxonomies, setTaxonomies ] = useState( [] );
+	const [ taxLoading, setTaxLoading ] = useState( false );
+	const [ taxError, setTaxError ] = useState( '' );
 	const [ loading, setLoading ] = useState( false );
 	const [ error, setError ] = useState( '' );
 	const [ taxonomy, setTaxonomy ] = useState( '' );
@@ -343,7 +347,20 @@ function BindingPanel( {
 	);
 
 	const bindings = attributes?.metadata?.bindings || {};
-	const hideIfEmpty = !!( attributes?.metadata?.dmf?.hideIfEmpty || attributes?.metadata?.daiDmf?.hideIfEmpty );
+	const dmfMeta = {
+		...( attributes?.metadata?.daiDmf || {} ),
+		...( attributes?.metadata?.dmf || {} ),
+	};
+	const hideIfEmpty = !! dmfMeta.hideIfEmpty;
+	const showIfField = dmfMeta.showIfField || '';
+	const showIfContext = dmfMeta.showIfContext || scfContext;
+	const showIfType =
+		dmfMeta.showIfType ||
+		( showIfField ? 'field' : '' ) ||
+		( dmfMeta.showIfTaxonomy ? 'taxonomy' : '' );
+	const showIfTaxonomy = dmfMeta.showIfTaxonomy || '';
+	const showIfTerm = dmfMeta.showIfTerm ? String( dmfMeta.showIfTerm ) : '';
+	const showIfTaxOperator = dmfMeta.showIfTaxOperator || 'has';
 
 	const currentKey = useMemo( () => {
 		const first = firstOurBinding( bindings );
@@ -426,6 +443,65 @@ function BindingPanel( {
 			cancelled = true;
 		};
 	}, [ scfContext, postId, postType, taxonomy ] );
+
+	useEffect( () => {
+		let cancelled = false;
+		setTaxLoading( true );
+		setTaxError( '' );
+
+		const loadTaxonomies = async () => {
+			try {
+				const qs = new URLSearchParams();
+				if ( postType ) {
+					qs.set( 'post_type', postType );
+				}
+				let res = await apiFetch( {
+					path: `/dynamic-metafield/v1/taxonomies?${ qs.toString() }`,
+				} );
+				let list = res?.taxonomies || [];
+
+				// Fallback: no post type filter if scoped result is empty.
+				if ( ! list.length && postType ) {
+					res = await apiFetch( {
+						path: `/dynamic-metafield/v1/taxonomies`,
+					} );
+					list = res?.taxonomies || [];
+				}
+
+				if ( ! cancelled ) {
+					setTaxonomies( list );
+					if ( ! list.length ) {
+						setTaxError(
+							__(
+								'Aucune taxonomie trouvée. Vérifiez que la taxonomie est enregistrée (show_ui) sur ce type de publication.',
+								'dynamic-metafield'
+							)
+						);
+					}
+				}
+			} catch ( err ) {
+				if ( ! cancelled ) {
+					setTaxonomies( [] );
+					setTaxError(
+						err?.message ||
+							__(
+								'Impossible de charger les taxonomies.',
+								'dynamic-metafield'
+							)
+					);
+				}
+			} finally {
+				if ( ! cancelled ) {
+					setTaxLoading( false );
+				}
+			}
+		};
+
+		loadTaxonomies();
+		return () => {
+			cancelled = true;
+		};
+	}, [ postType ] );
 
 	const compatible = useMemo(
 		() => filterFieldsForBlock( fields, name ),
@@ -584,6 +660,7 @@ function BindingPanel( {
 					...next,
 				},
 				dmf: {
+					...( attributes.metadata?.daiDmf || {} ),
 					...( attributes.metadata?.dmf || {} ),
 					hideIfEmpty,
 				},
@@ -594,6 +671,183 @@ function BindingPanel( {
 	const setHideIfEmpty = ( value ) => {
 		writeBindings( setAttributes, attributes, null, value, false );
 	};
+
+	/**
+	 * Persist visibility-by-field without touching bindings.
+	 *
+	 * @param {Object} patch Partial dmf meta.
+	 */
+	const patchDmfMeta = ( patch ) => {
+		const prevMeta = attributes.metadata || {};
+		const nextDmf = {
+			...( prevMeta.daiDmf || {} ),
+			...( prevMeta.dmf || {} ),
+			...patch,
+		};
+
+		const type = nextDmf.showIfType || '';
+		if ( ! type || type === 'none' ) {
+			delete nextDmf.showIfType;
+			delete nextDmf.showIfField;
+			delete nextDmf.showIfContext;
+			delete nextDmf.showIfRelative;
+			delete nextDmf.showIfTaxonomy;
+			delete nextDmf.showIfTerm;
+			delete nextDmf.showIfTaxOperator;
+		} else if ( type === 'field' ) {
+			delete nextDmf.showIfTaxonomy;
+			delete nextDmf.showIfTerm;
+			delete nextDmf.showIfTaxOperator;
+			if ( ! nextDmf.showIfField ) {
+				delete nextDmf.showIfField;
+				delete nextDmf.showIfContext;
+				delete nextDmf.showIfRelative;
+			}
+		} else if ( type === 'taxonomy' ) {
+			delete nextDmf.showIfField;
+			delete nextDmf.showIfContext;
+			delete nextDmf.showIfRelative;
+			if ( ! nextDmf.showIfTaxonomy ) {
+				delete nextDmf.showIfTaxonomy;
+				delete nextDmf.showIfTerm;
+				delete nextDmf.showIfTaxOperator;
+			}
+		}
+
+		setAttributes( {
+			metadata: {
+				...prevMeta,
+				dmf: nextDmf,
+			},
+		} );
+	};
+
+	const setShowIfType = ( type ) => {
+		if ( ! type || type === 'none' ) {
+			patchDmfMeta( { showIfType: '' } );
+			return;
+		}
+		patchDmfMeta( { showIfType: type } );
+	};
+
+	const setShowIfField = ( fieldName ) => {
+		if ( ! fieldName ) {
+			patchDmfMeta( {
+				showIfType: 'field',
+				showIfField: '',
+				showIfContext: undefined,
+				showIfRelative: undefined,
+			} );
+			return;
+		}
+		const field = fields.find( ( f ) => f.name === fieldName );
+		patchDmfMeta( {
+			showIfType: 'field',
+			showIfField: fieldName,
+			showIfContext: scfContext,
+			showIfRelative: !! field?.relative,
+		} );
+	};
+
+	const setShowIfTaxonomy = ( taxName ) => {
+		patchDmfMeta( {
+			showIfType: 'taxonomy',
+			showIfTaxonomy: taxName || '',
+			showIfTerm: '',
+			showIfTaxOperator: showIfTaxOperator || 'has',
+		} );
+	};
+
+	const setShowIfTerm = ( termValue ) => {
+		patchDmfMeta( {
+			showIfType: 'taxonomy',
+			showIfTaxonomy,
+			showIfTerm: termValue || '',
+			showIfTaxOperator: showIfTaxOperator || 'has',
+		} );
+	};
+
+	const setShowIfTaxOperator = ( op ) => {
+		patchDmfMeta( {
+			showIfType: 'taxonomy',
+			showIfTaxonomy,
+			showIfTerm,
+			showIfTaxOperator: op || 'has',
+		} );
+	};
+
+	const allFieldOptions = useMemo( () => {
+		const opts = [
+			{
+				label: __( '— Choisir un champ —', 'dynamic-metafield' ),
+				value: '',
+			},
+		];
+		( fields || [] )
+			.filter( ( f ) => ! f.loopable )
+			.forEach( ( field ) => {
+				opts.push( {
+					label: `${ field.label } [${ field.type }]`,
+					value: field.name,
+				} );
+			} );
+		return opts;
+	}, [ fields ] );
+
+	const taxonomyOptions = useMemo( () => {
+		const opts = [
+			{
+				label: __( '— Choisir une taxonomie —', 'dynamic-metafield' ),
+				value: '',
+			},
+		];
+		( taxonomies || [] ).forEach( ( tax ) => {
+			opts.push( {
+				label: `${ tax.label } (${ tax.name })`,
+				value: tax.name,
+			} );
+		} );
+		return opts;
+	}, [ taxonomies ] );
+
+	const termOptions = useMemo( () => {
+		const tax = ( taxonomies || [] ).find( ( t ) => t.name === showIfTaxonomy );
+		const opts = [
+			{
+				label: __( '— N’importe quel terme —', 'dynamic-metafield' ),
+				value: '',
+			},
+		];
+		( tax?.terms || [] ).forEach( ( term ) => {
+			opts.push( {
+				label: term.name,
+				value: String( term.id ),
+			} );
+		} );
+		return opts;
+	}, [ taxonomies, showIfTaxonomy ] );
+
+	const scfTaxonomyOptions = useMemo( () => {
+		const opts = [
+			{
+				label: __( '— Choisir —', 'dynamic-metafield' ),
+				value: '',
+			},
+		];
+		( taxonomies || [] ).forEach( ( tax ) => {
+			opts.push( {
+				label: `${ tax.label } (${ tax.name })`,
+				value: tax.name,
+			} );
+		} );
+		if ( ! opts.find( ( o ) => o.value === 'category' ) ) {
+			opts.push( { label: 'category', value: 'category' } );
+		}
+		if ( ! opts.find( ( o ) => o.value === 'post_tag' ) ) {
+			opts.push( { label: 'post_tag', value: 'post_tag' } );
+		}
+		return opts;
+	}, [ taxonomies ] );
 
 	return (
 		<InspectorControls>
@@ -616,14 +870,7 @@ function BindingPanel( {
 					<SelectControl
 						label={ __( 'Taxonomie', 'dynamic-metafield' ) }
 						value={ taxonomy }
-						options={ [
-							{
-								label: __( '— Choisir —', 'dynamic-metafield' ),
-								value: '',
-							},
-							{ label: 'category', value: 'category' },
-							{ label: 'post_tag', value: 'post_tag' },
-						] }
+						options={ scfTaxonomyOptions }
 						onChange={ setTaxonomy }
 					/>
 				) }
@@ -711,18 +958,131 @@ function BindingPanel( {
 						) }
 					</>
 				) }
+				<SelectControl
+					label={ __( 'Condition d’affichage', 'dynamic-metafield' ) }
+					value={ showIfType || 'none' }
+					options={ [
+						{
+							label: __( 'Toujours visible', 'dynamic-metafield' ),
+							value: 'none',
+						},
+						{
+							label: __( 'Si champ SCF rempli', 'dynamic-metafield' ),
+							value: 'field',
+						},
+						{
+							label: __( 'Selon taxonomie / terme', 'dynamic-metafield' ),
+							value: 'taxonomy',
+						},
+					] }
+					onChange={ setShowIfType }
+					help={ __(
+						'Indépendant du lien / libellé liés. Utile pour afficher un bouton seulement sur certains contenus.',
+						'dynamic-metafield'
+					) }
+				/>
+				{ showIfType === 'field' && (
+					<>
+						<SelectControl
+							label={ __( 'Champ à vérifier', 'dynamic-metafield' ) }
+							value={ showIfField }
+							options={ allFieldOptions }
+							onChange={ setShowIfField }
+						/>
+						{ showIfField && (
+							<p
+								style={ {
+									marginTop: 0,
+									opacity: 0.75,
+									fontSize: '12px',
+								} }
+							>
+								{ __( 'Contexte condition : ', 'dynamic-metafield' ) +
+									( showIfContext || scfContext ) }
+							</p>
+						) }
+					</>
+				) }
+				{ showIfType === 'taxonomy' && (
+					<>
+						{ taxLoading && <Spinner /> }
+						{ taxError && (
+							<Notice status="warning" isDismissible={ false }>
+								{ taxError }
+								{ postType
+									? ` (post_type: ${ postType })`
+									: '' }
+							</Notice>
+						) }
+						<SelectControl
+							label={ __( 'Taxonomie', 'dynamic-metafield' ) }
+							value={ showIfTaxonomy }
+							options={ taxonomyOptions }
+							onChange={ setShowIfTaxonomy }
+							help={
+								postType
+									? __(
+											'Taxonomies du type de contenu courant, puis les autres si besoin.',
+											'dynamic-metafield'
+									  )
+									: __(
+											'Toutes les taxonomies avec interface d’administration.',
+											'dynamic-metafield'
+									  )
+							}
+						/>
+						<SelectControl
+							label={ __( 'Terme', 'dynamic-metafield' ) }
+							value={ showIfTerm }
+							options={ termOptions }
+							onChange={ setShowIfTerm }
+							help={
+								showIfTaxonomy && termOptions.length <= 1
+									? __(
+											'Aucun terme dans cette taxonomie pour l’instant — créez-en un dans l’admin.',
+											'dynamic-metafield'
+									  )
+									: __(
+											'Laissez « n’importe quel terme » pour afficher dès qu’au moins un terme est assigné.',
+											'dynamic-metafield'
+									  )
+							}
+						/>
+						<SelectControl
+							label={ __( 'Règle', 'dynamic-metafield' ) }
+							value={ showIfTaxOperator }
+							options={ [
+								{
+									label: __(
+										'Afficher si le terme est présent',
+										'dynamic-metafield'
+									),
+									value: 'has',
+								},
+								{
+									label: __(
+										'Afficher si le terme est absent',
+										'dynamic-metafield'
+									),
+									value: 'not_has',
+								},
+							] }
+							onChange={ setShowIfTaxOperator }
+						/>
+					</>
+				) }
 				<ToggleControl
-					label={ __( 'Masquer si vide', 'dynamic-metafield' ) }
+					label={ __( 'Masquer si liaison vide', 'dynamic-metafield' ) }
 					checked={ hideIfEmpty }
 					onChange={ setHideIfEmpty }
 					help={
 						isButton
 							? __(
-									'Masque le bouton si le lien lié est vide, ou si seul le libellé est lié et vide.',
+									'Masque le bouton si le lien ou libellé lié SCF est vide.',
 									'dynamic-metafield'
 							  )
 							: __(
-									'N’affiche pas le bloc si la valeur du champ (avant préfixe/suffixe) est vide.',
+									'Masque le bloc si la valeur du champ lié (avant préfixe/suffixe) est vide.',
 									'dynamic-metafield'
 							  )
 					}

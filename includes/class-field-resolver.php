@@ -581,6 +581,46 @@ class Field_Resolver {
 	}
 
 	/**
+	 * Escape a URL for href/src while keeping custom schemes (obsidian://, etc.).
+	 *
+	 * WordPress esc_url() drops unknown protocols by default.
+	 *
+	 * @param mixed $url URL.
+	 * @return string
+	 */
+	public static function esc_href( $url ) {
+		$url = trim( (string) $url );
+		if ( '' === $url ) {
+			return '';
+		}
+
+		// Never allow scriptable schemes.
+		if ( preg_match( '#^\s*(javascript|data|vbscript):#i', $url ) ) {
+			return '';
+		}
+
+		$protocols = wp_allowed_protocols();
+		if ( preg_match( '#^([a-z][a-z0-9+.\-]*):#i', $url, $matches ) ) {
+			$scheme = strtolower( $matches[1] );
+			if ( ! in_array( $scheme, $protocols, true ) ) {
+				$protocols[] = $scheme;
+			}
+		}
+
+		$escaped = esc_url( $url, $protocols );
+		if ( $escaped ) {
+			return $escaped;
+		}
+
+		// Last resort for exotic schemes still rejected by esc_url.
+		if ( preg_match( '#^[a-z][a-z0-9+.\-]*:#i', $url ) ) {
+			return esc_attr( $url );
+		}
+
+		return '';
+	}
+
+	/**
 	 * Map of formatted values for editor preview.
 	 *
 	 * @param string               $context Context.

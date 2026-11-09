@@ -2,7 +2,7 @@
 	"name": "dynamic-metafield",
 	"version": "1.0.0",
 	"description": "Liaison dynamique Gutenberg ↔ Secure Custom Fields",
-	"author": "DAI",
+	"author": "Morglaf",
 	"license": "GPL-2.0-or-later",
 	"main": "build/index.js",
 	"scripts": {

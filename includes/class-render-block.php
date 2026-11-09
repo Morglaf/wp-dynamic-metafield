@@ -1,6 +1,6 @@
 <?php
 /**
- * Frontend render via render_block (Query Loop + hideIfEmpty).
+ * Frontend render via render_block (Query Loop + hideIfEmpty + showIfField).
  *
  * @package DynamicMetafield
  */
@@ -10,7 +10,7 @@ namespace DynamicMetafield;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Intercepts block HTML / attributes to inject SCF values and honor hideIfEmpty.
+ * Intercepts block HTML / attributes to inject SCF values and honor visibility.
  */
 class Render_Block {
 
@@ -38,6 +38,18 @@ class Render_Block {
 	}
 
 	/**
+	 * Read plugin meta bag (dmf + legacy daiDmf).
+	 *
+	 * @param array<string, mixed> $meta Block metadata.
+	 * @return array<string, mixed>
+	 */
+	private static function dmf_meta( $meta ) {
+		$dmf    = ( isset( $meta['dmf'] ) && is_array( $meta['dmf'] ) ) ? $meta['dmf'] : array();
+		$legacy = ( isset( $meta['daiDmf'] ) && is_array( $meta['daiDmf'] ) ) ? $meta['daiDmf'] : array();
+		return array_merge( $legacy, $dmf );
+	}
+
+	/**
 	 * Inject bound attribute values into parsed block before rendering.
 	 *
 	 * @param array<string, mixed> $parsed_block Parsed block.
@@ -53,14 +65,10 @@ class Render_Block {
 			return $parsed_block;
 		}
 
-		$context = array();
-		if ( ! empty( $parsed_block['attrs']['metadata'] ) ) {
-			// Context is not on attrs; WP fills it later. Use global query as fallback here.
-			$context = array(
-				'postId'   => (int) get_the_ID(),
-				'postType' => get_post_type() ? get_post_type() : '',
-			);
-		}
+		$context = array(
+			'postId'   => (int) get_the_ID(),
+			'postType' => get_post_type() ? get_post_type() : '',
+		);
 
 		foreach ( $our as $attribute_name => $source_args ) {
 			$value = Field_Resolver::resolve_bound_value( $source_args, $context, $attribute_name );
@@ -81,25 +89,31 @@ class Render_Block {
 	 * @return string
 	 */
 	public static function filter_render( $block_content, $block ) {
-		if ( empty( $block['blockName'] ) || empty( $block['attrs']['metadata']['bindings'] ) ) {
+		if ( empty( $block['blockName'] ) ) {
 			return $block_content;
 		}
 
-		$bindings = $block['attrs']['metadata']['bindings'];
+		$meta    = ( isset( $block['attrs']['metadata'] ) && is_array( $block['attrs']['metadata'] ) ) ? $block['attrs']['metadata'] : array();
+		$dmf     = self::dmf_meta( $meta );
+		$context = isset( $block['context'] ) && is_array( $block['context'] ) ? $block['context'] : array(
+			'postId'   => (int) get_the_ID(),
+			'postType' => get_post_type() ? get_post_type() : '',
+		);
+
+		// Visibility rules — independent of URL/text bindings.
+		if ( self::should_hide_by_visibility( $dmf, $context ) ) {
+			return '';
+		}
+
+		$bindings = isset( $meta['bindings'] ) && is_array( $meta['bindings'] ) ? $meta['bindings'] : array();
 		$our      = self::extract_our_bindings( $bindings );
 		if ( empty( $our ) ) {
 			return $block_content;
 		}
 
-		$meta       = $block['attrs']['metadata'];
-		$hide       = ! empty( $meta['dmf']['hideIfEmpty'] ) || ! empty( $meta['daiDmf']['hideIfEmpty'] );
+		$hide       = ! empty( $dmf['hideIfEmpty'] );
 		$block_name = $block['blockName'];
-		$context    = isset( $block['context'] ) && is_array( $block['context'] ) ? $block['context'] : array(
-			'postId'   => (int) get_the_ID(),
-			'postType' => get_post_type() ? get_post_type() : '',
-		);
-
-		$resolved = array();
+		$resolved   = array();
 
 		foreach ( $our as $attribute_name => $source_args ) {
 			$resolved[ $attribute_name ] = Field_Resolver::resolve_bound_value( $source_args, $context, $attribute_name );
@@ -110,6 +124,104 @@ class Render_Block {
 		}
 
 		return self::inject_html( $block_content, $block_name, $resolved );
+	}
+
+	/**
+	 * Hide block according to field / taxonomy visibility rules.
+	 *
+	 * @param array<string, mixed> $dmf     Plugin meta.
+	 * @param array<string, mixed> $context Block context.
+	 * @return bool
+	 */
+	private static function should_hide_by_visibility( $dmf, $context ) {
+		$type = isset( $dmf['showIfType'] ) ? (string) $dmf['showIfType'] : '';
+
+		// Backward compat: old configs only had showIfField.
+		if ( '' === $type && ! empty( $dmf['showIfField'] ) ) {
+			$type = 'field';
+		}
+
+		if ( 'field' === $type ) {
+			return self::should_hide_by_show_if_field( $dmf, $context );
+		}
+
+		if ( 'taxonomy' === $type || 'tax' === $type ) {
+			return self::should_hide_by_taxonomy( $dmf, $context );
+		}
+
+		return false;
+	}
+
+	/**
+	 * Hide block when showIfField is set and that SCF field is empty.
+	 *
+	 * @param array<string, mixed> $dmf     Plugin meta.
+	 * @param array<string, mixed> $context Block context.
+	 * @return bool
+	 */
+	private static function should_hide_by_show_if_field( $dmf, $context ) {
+		$field = isset( $dmf['showIfField'] ) ? (string) $dmf['showIfField'] : '';
+		if ( '' === $field ) {
+			return false;
+		}
+
+		$ctx_name = isset( $dmf['showIfContext'] ) ? (string) $dmf['showIfContext'] : 'post';
+		$relative = ! empty( $dmf['showIfRelative'] ) || ! empty( $GLOBALS['dmf_in_loop'] );
+
+		$args = array(
+			'postId'   => isset( $context['postId'] ) ? (int) $context['postId'] : (int) get_the_ID(),
+			'postType' => isset( $context['postType'] ) ? $context['postType'] : '',
+			'userId'   => isset( $dmf['showIfUserId'] ) ? (int) $dmf['showIfUserId'] : 0,
+			'termId'   => isset( $context['termId'] ) ? (int) $context['termId'] : 0,
+			'taxonomy' => isset( $context['taxonomy'] ) ? (string) $context['taxonomy'] : '',
+		);
+
+		$raw = Field_Resolver::get_value( $field, $ctx_name, $args, $relative );
+		return Field_Resolver::is_empty_value( $raw );
+	}
+
+	/**
+	 * Hide block when taxonomy condition fails.
+	 *
+	 * showIfTaxonomy required.
+	 * showIfTerm optional (slug or ID) — empty = any term in that taxonomy.
+	 * showIfTaxOperator: has|not_has (default has).
+	 *
+	 * @param array<string, mixed> $dmf     Plugin meta.
+	 * @param array<string, mixed> $context Block context.
+	 * @return bool
+	 */
+	private static function should_hide_by_taxonomy( $dmf, $context ) {
+		$taxonomy = isset( $dmf['showIfTaxonomy'] ) ? (string) $dmf['showIfTaxonomy'] : '';
+		if ( '' === $taxonomy || ! taxonomy_exists( $taxonomy ) ) {
+			return false;
+		}
+
+		$post_id = isset( $context['postId'] ) ? (int) $context['postId'] : (int) get_the_ID();
+		if ( ! $post_id ) {
+			return true;
+		}
+
+		$term     = isset( $dmf['showIfTerm'] ) ? $dmf['showIfTerm'] : '';
+		$operator = isset( $dmf['showIfTaxOperator'] ) ? (string) $dmf['showIfTaxOperator'] : 'has';
+		if ( ! in_array( $operator, array( 'has', 'not_has' ), true ) ) {
+			$operator = 'has';
+		}
+
+		if ( '' === $term || null === $term ) {
+			$terms = get_the_terms( $post_id, $taxonomy );
+			$has   = ! empty( $terms ) && ! is_wp_error( $terms );
+		} else {
+			// Accept numeric ID or slug.
+			$term_query = is_numeric( $term ) ? (int) $term : (string) $term;
+			$has        = has_term( $term_query, $taxonomy, $post_id );
+		}
+
+		if ( 'has' === $operator ) {
+			return ! $has;
+		}
+
+		return $has;
 	}
 
 	/**
@@ -168,7 +280,7 @@ class Render_Block {
 	}
 
 	/**
-	 * Keep only dynamic-metafield/scf bindings.
+	 * Keep only dynamic-metafield bindings.
 	 *
 	 * @param array<string, mixed> $bindings Bindings map.
 	 * @return array<string, array<string, mixed>>
@@ -222,16 +334,17 @@ class Render_Block {
 
 			case 'core/button' === $block_name:
 				if ( array_key_exists( 'url', $resolved ) && null !== $resolved['url'] && '' !== $resolved['url'] ) {
+					$href = Field_Resolver::esc_href( $resolved['url'] );
 					$html = preg_replace(
 						'#(<a\b[^>]*\bhref=)(["\'])(.*?)\2#i',
-						'$1$2' . esc_url( $resolved['url'] ) . '$2',
+						'$1$2' . $href . '$2',
 						$html,
 						1
 					);
 					if ( $html && ! preg_match( '#<a\b[^>]*\bhref=#i', $html ) ) {
 						$html = preg_replace(
 							'#(<a\b)#i',
-							'$1 href="' . esc_url( $resolved['url'] ) . '"',
+							'$1 href="' . $href . '"',
 							$html,
 							1
 						);
@@ -259,7 +372,7 @@ class Render_Block {
 				if ( isset( $resolved['url'] ) && null !== $resolved['url'] ) {
 					$html = preg_replace(
 						'#(<img\b[^>]*\bsrc=)(["\'])(.*?)\2#i',
-						'$1$2' . esc_url( $resolved['url'] ) . '$2',
+						'$1$2' . Field_Resolver::esc_href( $resolved['url'] ) . '$2',
 						$html,
 						1
 					);
@@ -276,8 +389,7 @@ class Render_Block {
 
 			case $is_embed:
 				if ( isset( $resolved['url'] ) && null !== $resolved['url'] && '' !== $resolved['url'] ) {
-					$url = esc_url( $resolved['url'] );
-					// Replace plain URL inside embed wrapper.
+					$url = Field_Resolver::esc_href( $resolved['url'] );
 					$html = preg_replace(
 						'#(<div\b[^>]*class="[^"]*wp-block-embed__wrapper[^"]*"[^>]*>)\s*.*?\s*(</div>)#is',
 						'$1' . $url . '$2',

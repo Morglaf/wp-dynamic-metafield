@@ -1,5 +1,8 @@
 node_modules/
 build/
+dist/
+*.zip
+make-zip.ps1
 *.log
 .DS_Store
 npm-debug.log*

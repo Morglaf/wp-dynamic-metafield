@@ -48,6 +48,22 @@ class Rest {
 				'args'                => self::context_args(),
 			)
 		);
+
+		register_rest_route(
+			self::NAMESPACE,
+			'/taxonomies',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( __CLASS__, 'get_taxonomies' ),
+				'permission_callback' => array( __CLASS__, 'can_edit' ),
+				'args'                => array(
+					'post_type' => array(
+						'type'    => 'string',
+						'default' => '',
+					),
+				),
+			)
+		);
 	}
 
 	/**
@@ -161,5 +177,111 @@ class Rest {
 		list( $context, $args ) = self::parse_request( $request );
 		$values = Field_Resolver::list_values( $context, $args );
 		return rest_ensure_response( array( 'values' => $values ) );
+	}
+
+	/**
+	 * GET /taxonomies — taxonomies (+ terms), optionally scoped to a post type.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response
+	 */
+	public static function get_taxonomies( $request ) {
+		$post_type = sanitize_key( (string) $request->get_param( 'post_type' ) );
+		$out       = self::collect_taxonomies( $post_type );
+
+		// If post_type was wrong / empty result, still expose usable taxonomies.
+		if ( empty( $out ) && $post_type ) {
+			$out = self::collect_taxonomies( '' );
+		}
+
+		return rest_ensure_response(
+			array(
+				'taxonomies' => $out,
+				'post_type'  => $post_type,
+			)
+		);
+	}
+
+	/**
+	 * Build taxonomy list with terms.
+	 *
+	 * @param string $post_type Optional post type slug.
+	 * @return array<int, array<string, mixed>>
+	 */
+	private static function collect_taxonomies( $post_type = '' ) {
+		$tax_objects = array();
+
+		if ( $post_type && post_type_exists( $post_type ) ) {
+			$tax_objects = get_object_taxonomies( $post_type, 'objects' );
+		} else {
+			// All taxonomies with an admin UI (includes non-public CPT taxonomies).
+			$tax_objects = get_taxonomies( array( 'show_ui' => true ), 'objects' );
+			if ( empty( $tax_objects ) ) {
+				$tax_objects = get_taxonomies( array(), 'objects' );
+			}
+		}
+
+		$out = array();
+		foreach ( (array) $tax_objects as $tax ) {
+			if ( empty( $tax->name ) ) {
+				continue;
+			}
+			// Skip internal/builtin link taxonomy.
+			if ( in_array( $tax->name, array( 'nav_menu', 'link_category', 'post_format', 'wp_pattern_category' ), true ) ) {
+				continue;
+			}
+			// Keep taxonomies usable in admin or assigned to objects.
+			if ( empty( $tax->public ) && empty( $tax->show_ui ) && empty( $tax->show_in_rest ) ) {
+				continue;
+			}
+
+			$terms_raw = get_terms(
+				array(
+					'taxonomy'   => $tax->name,
+					'hide_empty' => false,
+					'number'     => 300,
+				)
+			);
+			$terms = array();
+			if ( ! is_wp_error( $terms_raw ) && is_array( $terms_raw ) ) {
+				foreach ( $terms_raw as $term ) {
+					$terms[] = array(
+						'id'   => (int) $term->term_id,
+						'slug' => (string) $term->slug,
+						'name' => (string) $term->name,
+					);
+				}
+			}
+
+			$label = '';
+			if ( ! empty( $tax->labels ) && ! empty( $tax->labels->singular_name ) ) {
+				$label = (string) $tax->labels->singular_name;
+			} elseif ( ! empty( $tax->label ) ) {
+				$label = (string) $tax->label;
+			} else {
+				$label = (string) $tax->name;
+			}
+
+			$out[] = array(
+				'name'         => (string) $tax->name,
+				'label'        => $label,
+				'object_type'  => array_values( (array) $tax->object_type ),
+				'for_post_type'=> ( $post_type && in_array( $post_type, (array) $tax->object_type, true ) ),
+				'terms'        => $terms,
+			);
+		}
+
+		// Prefer taxonomies attached to the requested post type.
+		usort(
+			$out,
+			static function ( $a, $b ) {
+				if ( $a['for_post_type'] === $b['for_post_type'] ) {
+					return strcasecmp( $a['label'], $b['label'] );
+				}
+				return $a['for_post_type'] ? -1 : 1;
+			}
+		);
+
+		return $out;
 	}
 }

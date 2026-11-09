@@ -28,12 +28,12 @@ En développement : `npm start` (watch).
 
 Sur une liaison, tu peux ajouter du texte **avant** et **après** la valeur du champ.
 
-Exemple : champ = `github.com/Atelier-Recherche/obsidian-indexer`
+Exemple : champ = `github.com/pseudo/app`
 
 - Avant : `https://`
 - Après : `/releases.atom`
 
-→ résultat : `https://github.com/Atelier-Recherche/obsidian-indexer/releases.atom`
+→ résultat : `https://github.com/pseudo/app/releases.atom`
 
 Utile pour un bouton, un paragraphe, un flux **RSS**, ou un **embed YouTube**.
 
