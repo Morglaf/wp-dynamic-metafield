@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:       Dynamic Metafield
+ * Plugin Name:       WP Dynamic Metafield
  * Plugin URI:        https://wordpress.org/plugins/wp-dynamic-metafield/
  * Description:       Dynamically bind Gutenberg blocks to Secure Custom Fields (Block Bindings + render_block).
  * Version:           1.0.0

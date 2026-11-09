@@ -1,4 +1,4 @@
-# Dynamic Metafield
+# WP Dynamic Metafield
 
 WordPress plugin that binds native Gutenberg blocks to **Secure Custom Fields** (ACF-compatible API) via the **Block Bindings API**, an **InspectorControls** panel, and server-side `render_block` (Query Loop aware).
 

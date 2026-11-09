@@ -1,4 +1,4 @@
-=== Dynamic Metafield ===
+=== WP Dynamic Metafield ===
 Contributors: morglaf
 Tags: gutenberg, block bindings, secure custom fields, acf, metafields
 Requires at least: 6.7
@@ -12,7 +12,7 @@ Bind native Gutenberg blocks to Secure Custom Fields via Block Bindings, Inspect
 
 == Description ==
 
-Dynamic Metafield connects WordPress block editor content to **Secure Custom Fields** (ACF-compatible API) without proprietary meta.
+WP Dynamic Metafield connects WordPress block editor content to **Secure Custom Fields** (ACF-compatible API) without proprietary meta.
 
 Features:
 
@@ -29,7 +29,7 @@ Requires the **Secure Custom Fields** plugin (or another plugin exposing `get_fi
 == Installation ==
 
 1. Upload the `wp-dynamic-metafield` folder to `/wp-content/plugins/`
-2. Activate **Dynamic Metafield** through the Plugins screen
+2. Activate **WP Dynamic Metafield** through the Plugins screen
 3. Ensure Secure Custom Fields (or compatible ACF API) is active
 4. Edit a post or template, select a supported block, open the **SCF Binding** panel
 
