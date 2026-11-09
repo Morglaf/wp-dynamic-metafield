@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || exit;
  */
 class Assets {
 
-	const HANDLE = 'dynamic-metafield-editor';
+	const HANDLE = 'wp-dynamic-metafield-editor';
 
 	/**
 	 * Hook enqueue.
@@ -71,7 +71,7 @@ class Assets {
 		}
 
 		if ( function_exists( 'wp_set_script_translations' ) ) {
-			wp_set_script_translations( self::HANDLE, 'dynamic-metafield' );
+			wp_set_script_translations( self::HANDLE, DMF_TEXTDOMAIN, DMF_PATH . 'languages' );
 		}
 	}
 
@@ -100,11 +100,12 @@ class Assets {
 			self::HANDLE,
 			'dmfSettings',
 			array(
-				'source'    => DMF_SOURCE,
-				'restUrl'   => esc_url_raw( rest_url( Rest::NAMESPACE ) ),
-				'nonce'     => wp_create_nonce( 'wp_rest' ),
-				'postId'    => (int) $post_id,
-				'pluginUrl' => DMF_URL,
+				'source'        => DMF_SOURCE,
+				'restNamespace' => Rest::NAMESPACE,
+				'restUrl'       => esc_url_raw( rest_url( Rest::NAMESPACE ) ),
+				'nonce'         => wp_create_nonce( 'wp_rest' ),
+				'postId'        => (int) $post_id,
+				'pluginUrl'     => DMF_URL,
 			)
 		);
 	}

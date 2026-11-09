@@ -10,9 +10,26 @@ namespace DynamicMetafield;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Registers dynamic-metafield/loop and renders SCF row loops server-side.
+ * Registers wp-dynamic-metafield/loop and renders SCF row loops server-side.
  */
 class Container_Block {
+
+	/**
+	 * Shared attributes for legacy block registrations.
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	private static function loop_attributes() {
+		return array(
+			'field'    => array( 'type' => 'string', 'default' => '' ),
+			'context'  => array( 'type' => 'string', 'default' => 'post' ),
+			'layout'   => array( 'type' => 'string', 'default' => '' ),
+			'userId'   => array( 'type' => 'number', 'default' => 0 ),
+			'termId'   => array( 'type' => 'number', 'default' => 0 ),
+			'taxonomy' => array( 'type' => 'string', 'default' => '' ),
+			'tagName'  => array( 'type' => 'string', 'default' => 'div' ),
+		);
+	}
 
 	/**
 	 * Register block type.
@@ -22,7 +39,7 @@ class Container_Block {
 	}
 
 	/**
-	 * Register from block.json + render callback.
+	 * Register from block.json + render callback + legacy names.
 	 */
 	public static function register_block() {
 		$block_json = DMF_PATH . 'blocks/loop';
@@ -34,32 +51,30 @@ class Container_Block {
 			$block_json,
 			array(
 				'render_callback' => array( __CLASS__, 'render' ),
-				'editor_script'   => 'dynamic-metafield-editor',
-				'editor_style'    => 'dynamic-metafield-editor',
+				'editor_script'   => Assets::HANDLE,
+				'editor_style'    => Assets::HANDLE,
 			)
 		);
 
-		// Legacy block name for content saved before the rename.
-		register_block_type(
-			'dai-dmf/loop',
-			array(
-				'api_version'     => 3,
-				'title'           => __( 'SCF Field Loop (legacy)', 'dynamic-metafield' ),
-				'category'        => 'theme',
-				'render_callback' => array( __CLASS__, 'render' ),
-				'attributes'      => array(
-					'field'    => array( 'type' => 'string', 'default' => '' ),
-					'context'  => array( 'type' => 'string', 'default' => 'post' ),
-					'layout'   => array( 'type' => 'string', 'default' => '' ),
-					'userId'   => array( 'type' => 'number', 'default' => 0 ),
-					'termId'   => array( 'type' => 'number', 'default' => 0 ),
-					'taxonomy' => array( 'type' => 'string', 'default' => '' ),
-					'tagName'  => array( 'type' => 'string', 'default' => 'div' ),
-				),
-				'supports'        => array( 'html' => false ),
-				'uses_context'    => array( 'postId', 'postType', 'termId', 'taxonomy' ),
-			)
+		$legacy_names = array(
+			'dynamic-metafield/loop' => __( 'SCF Field Loop (legacy)', 'wp-dynamic-metafield' ),
+			'dai-dmf/loop'           => __( 'SCF Field Loop (legacy)', 'wp-dynamic-metafield' ),
 		);
+
+		foreach ( $legacy_names as $name => $title ) {
+			register_block_type(
+				$name,
+				array(
+					'api_version'     => 3,
+					'title'           => $title,
+					'category'        => 'theme',
+					'render_callback' => array( __CLASS__, 'render' ),
+					'attributes'      => self::loop_attributes(),
+					'supports'        => array( 'html' => false ),
+					'uses_context'    => array( 'postId', 'postType', 'termId', 'taxonomy' ),
+				)
+			);
+		}
 	}
 
 	/**
@@ -84,7 +99,7 @@ class Container_Block {
 		if ( false !== strpos( $field_selector, ':' ) ) {
 			$field_selector = strstr( $field_selector, ':', true );
 		}
-		$segments = Field_Resolver::parse_path( $field_selector );
+		$segments       = Field_Resolver::parse_path( $field_selector );
 		$field_selector = implode( '.', $segments );
 		// have_rows expects top-level or nested with parent loops; use leaf for simplicity.
 		$leaf = end( $segments );
@@ -111,7 +126,7 @@ class Container_Block {
 			return '';
 		}
 
-		$output = '';
+		$output                 = '';
 		$GLOBALS['DMF_in_loop'] = true;
 
 		while ( have_rows( $leaf, $acf_id ) ) {
@@ -132,7 +147,7 @@ class Container_Block {
 		$GLOBALS['DMF_in_loop'] = false;
 
 		$tag   = isset( $attributes['tagName'] ) ? tag_escape( $attributes['tagName'] ) : 'div';
-		$class = 'wp-block-dynamic-metafield-loop';
+		$class = 'wp-block-wp-dynamic-metafield-loop';
 		if ( ! empty( $attributes['className'] ) ) {
 			$class .= ' ' . $attributes['className'];
 		}

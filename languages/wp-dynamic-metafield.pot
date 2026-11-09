@@ -1,0 +1,227 @@
+# Copyright (C) 2026 Morglaf
+# This file is distributed under the same license as the wp-dynamic-metafield package.
+msgid ""
+msgstr ""
+"Project-Id-Version: wp-dynamic-metafield 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-23 00:00+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: wp-dynamic-metafield\n"
+
+msgid "After (suffix)"
+msgstr ""
+
+msgid "All taxonomies with an admin UI."
+msgstr ""
+
+msgid "Always visible"
+msgstr ""
+
+msgid "Before (prefix)"
+msgstr ""
+
+msgid "Button label"
+msgstr ""
+
+msgid "Button link (URL)"
+msgstr ""
+
+msgid "By taxonomy / term"
+msgstr ""
+
+msgid "Columns"
+msgstr ""
+
+msgid "Condition context: "
+msgstr ""
+
+msgid "Context"
+msgstr ""
+
+msgid "Display author"
+msgstr ""
+
+msgid "Display date"
+msgstr ""
+
+msgid "Display excerpt"
+msgstr ""
+
+msgid "Dynamic Metafield requires Secure Custom Fields (or a compatible ACF API) to be active."
+msgstr ""
+
+msgid "Dynamic Metafield requires WordPress 6.7 or newer."
+msgstr ""
+
+msgid "E.g. before=https:// and after=/releases.atom for a GitHub path."
+msgstr ""
+
+msgid "Field to check"
+msgstr ""
+
+msgid "Flexible layout (optional)"
+msgstr ""
+
+msgid "Grid"
+msgstr ""
+
+msgid "HTML tag"
+msgstr ""
+
+msgid "Hide if binding is empty"
+msgstr ""
+
+msgid "Hides the block if the bound field value (before prefix/suffix) is empty."
+msgstr ""
+
+msgid "Hides the button if the bound SCF link or label is empty."
+msgstr ""
+
+msgid "If SCF field is filled"
+msgstr ""
+
+msgid "If set, only Flexible Content rows with this layout are rendered."
+msgstr ""
+
+msgid "Independent of bound link / label. Useful to show a button only on some content."
+msgstr ""
+
+msgid "Layout"
+msgstr ""
+
+msgid "Leave “any term” to show whenever at least one term is assigned."
+msgstr ""
+
+msgid "List"
+msgstr ""
+
+msgid "Loop over a Secure Custom Fields Repeater or Flexible Content field and render child blocks for each row."
+msgstr ""
+
+msgid "Loop over a Secure Custom Fields Repeater or Flexible Content field."
+msgstr ""
+
+msgid "Loopable field"
+msgstr ""
+
+msgid "Max excerpt words"
+msgstr ""
+
+msgid "No compatible field for this block."
+msgstr ""
+
+msgid "No taxonomy found. Check that a taxonomy with an admin UI is registered for this post type."
+msgstr ""
+
+msgid "No terms in this taxonomy yet — create one in the admin."
+msgstr ""
+
+msgid "Number of items"
+msgstr ""
+
+msgid "Open links in a new tab"
+msgstr ""
+
+msgid "Post"
+msgstr ""
+
+msgid "RSS / Atom feed options"
+msgstr ""
+
+msgid "RSS feed URL field"
+msgstr ""
+
+msgid "Remove binding"
+msgstr ""
+
+msgid "Rule"
+msgstr ""
+
+msgid "SCF Binding"
+msgstr ""
+
+msgid "SCF Field Loop"
+msgstr ""
+
+msgid "SCF Field Loop (legacy)"
+msgstr ""
+
+msgid "SCF Loop"
+msgstr ""
+
+msgid "SCF Options"
+msgstr ""
+
+msgid "SCF field"
+msgstr ""
+
+msgid "SCF loop — choose a Repeater / Flexible field"
+msgstr ""
+
+msgid "SCF loop: "
+msgstr ""
+
+msgid "Secure Custom Fields"
+msgstr ""
+
+msgid "Secure Custom Fields (legacy)"
+msgstr ""
+
+msgid "Show if the term is absent"
+msgstr ""
+
+msgid "Show if the term is present"
+msgstr ""
+
+msgid "Taxonomies for the current post type, then others if needed."
+msgstr ""
+
+msgid "Taxonomy"
+msgstr ""
+
+msgid "Term"
+msgstr ""
+
+msgid "URL field (embed / YouTube)"
+msgstr ""
+
+msgid "Unable to load SCF fields."
+msgstr ""
+
+msgid "Unable to load taxonomies."
+msgstr ""
+
+msgid "User (author)"
+msgstr ""
+
+msgid "Visibility condition"
+msgstr ""
+
+msgid "Wrapped around the field value, e.g. https:// + field + /releases.atom"
+msgstr ""
+
+msgid "flexible"
+msgstr ""
+
+msgid "repeater"
+msgstr ""
+
+msgid "— Any term —"
+msgstr ""
+
+msgid "— Choose a field —"
+msgstr ""
+
+msgid "— Choose a repeater / flexible field —"
+msgstr ""
+
+msgid "— Choose a taxonomy —"
+msgstr ""
+
+msgid "— Choose —"
+msgstr ""
+
+msgid "— No binding —"
+msgstr ""

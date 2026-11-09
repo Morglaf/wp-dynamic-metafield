@@ -1,5 +1,5 @@
 /**
- * DAI Dynamic Metafield — editor entry.
+ * Dynamic Metafield — editor entry.
  */
 import './components/binding-panel';
 import { registerScfBindingsSource } from './bindings-source';

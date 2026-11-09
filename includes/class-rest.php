@@ -10,11 +10,21 @@ namespace DynamicMetafield;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * REST routes under dynamic-metafield/v1.
+ * REST routes under wp-dynamic-metafield/v1 (+ legacy namespaces).
  */
 class Rest {
 
-	const NAMESPACE = 'dynamic-metafield/v1';
+	const NAMESPACE = 'wp-dynamic-metafield/v1';
+
+	/**
+	 * Legacy namespaces kept for older editor builds.
+	 *
+	 * @var string[]
+	 */
+	const LEGACY_NAMESPACES = array(
+		'dynamic-metafield/v1',
+		'dai-dmf/v1',
+	);
 
 	/**
 	 * Register routes.
@@ -27,43 +37,47 @@ class Rest {
 	 * Routes.
 	 */
 	public static function register_routes() {
-		register_rest_route(
-			self::NAMESPACE,
-			'/fields',
-			array(
-				'methods'             => 'GET',
-				'callback'            => array( __CLASS__, 'get_fields' ),
-				'permission_callback' => array( __CLASS__, 'can_edit' ),
-				'args'                => self::context_args(),
-			)
-		);
+		$namespaces = array_merge( array( self::NAMESPACE ), self::LEGACY_NAMESPACES );
 
-		register_rest_route(
-			self::NAMESPACE,
-			'/values',
-			array(
-				'methods'             => 'GET',
-				'callback'            => array( __CLASS__, 'get_values' ),
-				'permission_callback' => array( __CLASS__, 'can_edit' ),
-				'args'                => self::context_args(),
-			)
-		);
+		foreach ( $namespaces as $ns ) {
+			register_rest_route(
+				$ns,
+				'/fields',
+				array(
+					'methods'             => 'GET',
+					'callback'            => array( __CLASS__, 'get_fields' ),
+					'permission_callback' => array( __CLASS__, 'can_edit' ),
+					'args'                => self::context_args(),
+				)
+			);
 
-		register_rest_route(
-			self::NAMESPACE,
-			'/taxonomies',
-			array(
-				'methods'             => 'GET',
-				'callback'            => array( __CLASS__, 'get_taxonomies' ),
-				'permission_callback' => array( __CLASS__, 'can_edit' ),
-				'args'                => array(
-					'post_type' => array(
-						'type'    => 'string',
-						'default' => '',
+			register_rest_route(
+				$ns,
+				'/values',
+				array(
+					'methods'             => 'GET',
+					'callback'            => array( __CLASS__, 'get_values' ),
+					'permission_callback' => array( __CLASS__, 'can_edit' ),
+					'args'                => self::context_args(),
+				)
+			);
+
+			register_rest_route(
+				$ns,
+				'/taxonomies',
+				array(
+					'methods'             => 'GET',
+					'callback'            => array( __CLASS__, 'get_taxonomies' ),
+					'permission_callback' => array( __CLASS__, 'can_edit' ),
+					'args'                => array(
+						'post_type' => array(
+							'type'    => 'string',
+							'default' => '',
+						),
 					),
-				),
-			)
-		);
+				)
+			);
+		}
 	}
 
 	/**

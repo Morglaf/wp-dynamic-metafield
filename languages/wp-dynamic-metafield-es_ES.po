@@ -1,0 +1,227 @@
+# wp-dynamic-metafield es_ES translation
+# Copyright (C) 2026 Morglaf
+msgid ""
+msgstr ""
+"Project-Id-Version: wp-dynamic-metafield 1.0.0\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: wp-dynamic-metafield\n"
+
+msgid "After (suffix)"
+msgstr "Después (sufijo)"
+
+msgid "All taxonomies with an admin UI."
+msgstr "Todas las taxonomías con interfaz de administración."
+
+msgid "Always visible"
+msgstr "Siempre visible"
+
+msgid "Before (prefix)"
+msgstr "Antes (prefijo)"
+
+msgid "Button label"
+msgstr "Etiqueta del botón"
+
+msgid "Button link (URL)"
+msgstr "Enlace del botón (URL)"
+
+msgid "By taxonomy / term"
+msgstr "Según taxonomía / término"
+
+msgid "Columns"
+msgstr "Columnas"
+
+msgid "Condition context: "
+msgstr "Contexto de condición: "
+
+msgid "Context"
+msgstr "Contexto"
+
+msgid "Display author"
+msgstr "Mostrar autor"
+
+msgid "Display date"
+msgstr "Mostrar fecha"
+
+msgid "Display excerpt"
+msgstr "Mostrar extracto"
+
+msgid "Dynamic Metafield requires Secure Custom Fields (or a compatible ACF API) to be active."
+msgstr "Dynamic Metafield requiere que Secure Custom Fields (o una API ACF compatible) esté activo."
+
+msgid "Dynamic Metafield requires WordPress 6.7 or newer."
+msgstr "Dynamic Metafield requiere WordPress 6.7 o posterior."
+
+msgid "E.g. before=https:// and after=/releases.atom for a GitHub path."
+msgstr "P. ej. before=https:// y after=/releases.atom para una ruta de GitHub."
+
+msgid "Field to check"
+msgstr "Campo a comprobar"
+
+msgid "Flexible layout (optional)"
+msgstr "Diseño flexible (opcional)"
+
+msgid "Grid"
+msgstr "Cuadrícula"
+
+msgid "HTML tag"
+msgstr "Etiqueta HTML"
+
+msgid "Hide if binding is empty"
+msgstr "Ocultar si el enlace está vacío"
+
+msgid "Hides the block if the bound field value (before prefix/suffix) is empty."
+msgstr "Oculta el bloque si el valor del campo vinculado (antes del prefijo/sufijo) está vacío."
+
+msgid "Hides the button if the bound SCF link or label is empty."
+msgstr "Oculta el botón si el enlace o etiqueta SCF vinculados están vacíos."
+
+msgid "If SCF field is filled"
+msgstr "Si el campo SCF está relleno"
+
+msgid "If set, only Flexible Content rows with this layout are rendered."
+msgstr "Si se indica, solo se renderizan las filas de este diseño de Flexible Content."
+
+msgid "Independent of bound link / label. Useful to show a button only on some content."
+msgstr "Independiente del enlace / etiqueta vinculados. Útil para mostrar un botón solo en ciertos contenidos."
+
+msgid "Layout"
+msgstr "Diseño"
+
+msgid "Leave “any term” to show whenever at least one term is assigned."
+msgstr "Deje «cualquier término» para mostrar cuando haya al menos un término asignado."
+
+msgid "List"
+msgstr "Lista"
+
+msgid "Loop over a Secure Custom Fields Repeater or Flexible Content field and render child blocks for each row."
+msgstr "Recorre un campo Repeater o Flexible Content de SCF y muestra los bloques hijos en cada fila."
+
+msgid "Loop over a Secure Custom Fields Repeater or Flexible Content field."
+msgstr "Recorre un campo Repeater o Flexible Content de SCF."
+
+msgid "Loopable field"
+msgstr "Campo iterable"
+
+msgid "Max excerpt words"
+msgstr "Longitud del extracto"
+
+msgid "No compatible field for this block."
+msgstr "Ningún campo compatible para este bloque."
+
+msgid "No taxonomy found. Check that a taxonomy with an admin UI is registered for this post type."
+msgstr "No se encontró ninguna taxonomía. Compruebe que hay una taxonomía con interfaz de administración registrada para este tipo de contenido."
+
+msgid "No terms in this taxonomy yet — create one in the admin."
+msgstr "Aún no hay términos en esta taxonomía — cree uno en el administrador."
+
+msgid "Number of items"
+msgstr "Número de elementos"
+
+msgid "Open links in a new tab"
+msgstr "Abrir enlaces en una pestaña nueva"
+
+msgid "Post"
+msgstr "Entrada (post)"
+
+msgid "RSS / Atom feed options"
+msgstr "Opciones del feed RSS / Atom"
+
+msgid "RSS feed URL field"
+msgstr "Campo URL del feed RSS"
+
+msgid "Remove binding"
+msgstr "Eliminar enlace"
+
+msgid "Rule"
+msgstr "Regla"
+
+msgid "SCF Binding"
+msgstr "Enlace SCF"
+
+msgid "SCF Field Loop"
+msgstr "Bucle de campo SCF"
+
+msgid "SCF Field Loop (legacy)"
+msgstr "Bucle de campo SCF (heredado)"
+
+msgid "SCF Loop"
+msgstr "Bucle SCF"
+
+msgid "SCF Options"
+msgstr "Opciones SCF"
+
+msgid "SCF field"
+msgstr "Campo SCF"
+
+msgid "SCF loop — choose a Repeater / Flexible field"
+msgstr "Bucle SCF — elija un campo Repeater / Flexible"
+
+msgid "SCF loop: "
+msgstr "Bucle SCF: "
+
+msgid "Secure Custom Fields"
+msgstr "Secure Custom Fields"
+
+msgid "Secure Custom Fields (legacy)"
+msgstr "Secure Custom Fields (heredado)"
+
+msgid "Show if the term is absent"
+msgstr "Mostrar si el término está ausente"
+
+msgid "Show if the term is present"
+msgstr "Mostrar si el término está presente"
+
+msgid "Taxonomies for the current post type, then others if needed."
+msgstr "Taxonomías del tipo de contenido actual, luego otras si es necesario."
+
+msgid "Taxonomy"
+msgstr "Taxonomía"
+
+msgid "Term"
+msgstr "Término"
+
+msgid "URL field (embed / YouTube)"
+msgstr "Campo URL (embed / YouTube)"
+
+msgid "Unable to load SCF fields."
+msgstr "No se pueden cargar los campos SCF."
+
+msgid "Unable to load taxonomies."
+msgstr "No se pueden cargar las taxonomías."
+
+msgid "User (author)"
+msgstr "Usuario (autor)"
+
+msgid "Visibility condition"
+msgstr "Condición de visibilidad"
+
+msgid "Wrapped around the field value, e.g. https:// + field + /releases.atom"
+msgstr "Se añade alrededor del valor del campo, p. ej. https:// + campo + /releases.atom"
+
+msgid "flexible"
+msgstr "flexible"
+
+msgid "repeater"
+msgstr "repetidor"
+
+msgid "— Any term —"
+msgstr "— Cualquier término —"
+
+msgid "— Choose a field —"
+msgstr "— Elegir un campo —"
+
+msgid "— Choose a repeater / flexible field —"
+msgstr "— Elegir un repetidor / flexible —"
+
+msgid "— Choose a taxonomy —"
+msgstr "— Elegir una taxonomía —"
+
+msgid "— Choose —"
+msgstr "— Elegir —"
+
+msgid "— No binding —"
+msgstr "— Sin enlace —"

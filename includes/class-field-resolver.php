@@ -266,7 +266,7 @@ class Field_Resolver {
 			if ( 'repeater' === $type ) {
 				$out[] = array(
 					'name'     => $path,
-					'label'    => $label . ' (' . __( 'repeater', 'dynamic-metafield' ) . ')',
+					'label'    => $label . ' (' . __( 'repeater', 'wp-dynamic-metafield' ) . ')',
 					'type'     => $type,
 					'group'    => $group_title,
 					'relative' => $relative,
@@ -281,7 +281,7 @@ class Field_Resolver {
 			if ( 'flexible_content' === $type ) {
 				$out[] = array(
 					'name'     => $path,
-					'label'    => $label . ' (' . __( 'flexible', 'dynamic-metafield' ) . ')',
+					'label'    => $label . ' (' . __( 'flexible', 'wp-dynamic-metafield' ) . ')',
 					'type'     => $type,
 					'group'    => $group_title,
 					'relative' => $relative,

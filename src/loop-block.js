@@ -1,5 +1,5 @@
 /**
- * Editor UI for dynamic-metafield/loop container block.
+ * Editor UI for wp-dynamic-metafield/loop container block.
  */
 import { registerBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
@@ -18,16 +18,20 @@ import {
 	buildFieldsQuery,
 } from './utils/editor-query';
 
+const I18N = 'wp-dynamic-metafield';
+
 const settings =
 	typeof window !== 'undefined' && window.dmfSettings
 		? window.dmfSettings
-		: { postId: 0 };
+		: { postId: 0, restNamespace: 'wp-dynamic-metafield/v1' };
+
+const REST_NS = settings.restNamespace || 'wp-dynamic-metafield/v1';
 
 const CONTEXT_OPTIONS = [
-	{ label: __( 'Publication (post)', 'dynamic-metafield' ), value: 'post' },
-	{ label: __( 'Options SCF', 'dynamic-metafield' ), value: 'option' },
-	{ label: __( 'Utilisateur (auteur)', 'dynamic-metafield' ), value: 'user' },
-	{ label: __( 'Terme', 'dynamic-metafield' ), value: 'term' },
+	{ label: __( 'Post', I18N ), value: 'post' },
+	{ label: __( 'SCF Options', I18N ), value: 'option' },
+	{ label: __( 'User (author)', I18N ), value: 'user' },
+	{ label: __( 'Term', I18N ), value: 'term' },
 ];
 
 const ALLOWED = [
@@ -38,7 +42,9 @@ const ALLOWED = [
 	'core/group',
 	'core/columns',
 	'core/column',
+	'wp-dynamic-metafield/loop',
 	'dynamic-metafield/loop',
+	'dai-dmf/loop',
 ];
 
 function Edit( { attributes, setAttributes } ) {
@@ -60,7 +66,7 @@ function Edit( { attributes, setAttributes } ) {
 			postType,
 			taxonomy,
 		} );
-		apiFetch( { path: `/dynamic-metafield/v1/fields?${ qs.toString() }` } )
+		apiFetch( { path: `/${ REST_NS }/fields?${ qs.toString() }` } )
 			.then( ( res ) => {
 				if ( ! cancelled ) {
 					setFields( res.fields || [] );
@@ -89,7 +95,7 @@ function Edit( { attributes, setAttributes } ) {
 	const fieldOptions = useMemo( () => {
 		const opts = [
 			{
-				label: __( '— Choisir un repeater / flexible —', 'dynamic-metafield' ),
+				label: __( '— Choose a repeater / flexible field —', I18N ),
 				value: '',
 			},
 		];
@@ -103,25 +109,25 @@ function Edit( { attributes, setAttributes } ) {
 	}, [ loopables ] );
 
 	const blockProps = useBlockProps( {
-		className: 'wp-block-dynamic-metafield-loop',
+		className: 'wp-block-wp-dynamic-metafield-loop',
 	} );
 
 	return (
 		<>
 			<InspectorControls>
 				<PanelBody
-					title={ __( 'Boucle SCF', 'dynamic-metafield' ) }
+					title={ __( 'SCF Loop', I18N ) }
 					initialOpen={ true }
 				>
 					<SelectControl
-						label={ __( 'Contexte', 'dynamic-metafield' ) }
+						label={ __( 'Context', I18N ) }
 						value={ context }
 						options={ CONTEXT_OPTIONS }
 						onChange={ ( value ) => setAttributes( { context: value } ) }
 					/>
 					{ context === 'term' && (
 						<TextControl
-							label={ __( 'Taxonomie', 'dynamic-metafield' ) }
+							label={ __( 'Taxonomy', I18N ) }
 							value={ taxonomy }
 							onChange={ ( value ) => setAttributes( { taxonomy: value } ) }
 						/>
@@ -130,23 +136,23 @@ function Edit( { attributes, setAttributes } ) {
 						<Spinner />
 					) : (
 						<SelectControl
-							label={ __( 'Champ bouclable', 'dynamic-metafield' ) }
+							label={ __( 'Loopable field', I18N ) }
 							value={ field }
 							options={ fieldOptions }
 							onChange={ ( value ) => setAttributes( { field: value } ) }
 						/>
 					) }
 					<TextControl
-						label={ __( 'Layout flexible (optionnel)', 'dynamic-metafield' ) }
+						label={ __( 'Flexible layout (optional)', I18N ) }
 						value={ layout }
 						onChange={ ( value ) => setAttributes( { layout: value } ) }
 						help={ __(
-							'Si renseigné, seules les lignes de ce layout Flexible Content sont rendues.',
-							'dynamic-metafield'
+							'If set, only Flexible Content rows with this layout are rendered.',
+							I18N
 						) }
 					/>
 					<SelectControl
-						label={ __( 'Balise HTML', 'dynamic-metafield' ) }
+						label={ __( 'HTML tag', I18N ) }
 						value={ tagName || 'div' }
 						options={ [
 							{ label: 'div', value: 'div' },
@@ -161,10 +167,10 @@ function Edit( { attributes, setAttributes } ) {
 			<div { ...blockProps }>
 				<p className="dmf-loop__label">
 					{ field
-						? __( 'Boucle SCF : ', 'dynamic-metafield' ) + field
+						? __( 'SCF loop: ', I18N ) + field
 						: __(
-								'Boucle SCF — choisissez un champ Repeater / Flexible',
-								'dynamic-metafield'
+								'SCF loop — choose a Repeater / Flexible field',
+								I18N
 						  ) }
 				</p>
 				<InnerBlocks allowedBlocks={ ALLOWED } />
@@ -174,12 +180,12 @@ function Edit( { attributes, setAttributes } ) {
 }
 
 export function registerLoopBlock() {
-	registerBlockType( 'dynamic-metafield/loop', {
+	registerBlockType( 'wp-dynamic-metafield/loop', {
 		apiVersion: 3,
-		title: __( 'SCF Field Loop', 'dynamic-metafield' ),
+		title: __( 'SCF Field Loop', I18N ),
 		description: __(
-			'Boucle sur un Repeater ou Flexible Content SCF.',
-			'dynamic-metafield'
+			'Loop over a Secure Custom Fields Repeater or Flexible Content field.',
+			I18N
 		),
 		category: 'theme',
 		icon: 'update',

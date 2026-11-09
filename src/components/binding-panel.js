@@ -33,13 +33,17 @@ import {
 const settings =
 	typeof window !== 'undefined' && window.dmfSettings
 		? window.dmfSettings
-		: { source: 'dynamic-metafield/scf', postId: 0 };
+		: { source: 'wp-dynamic-metafield/scf', restNamespace: 'wp-dynamic-metafield/v1', postId: 0 };
 
 const OUR_SOURCES = [
-	settings.source || 'dynamic-metafield/scf',
+	settings.source || 'wp-dynamic-metafield/scf',
+	'wp-dynamic-metafield/scf',
 	'dynamic-metafield/scf',
 	'dai-dmf/scf',
 ];
+
+const REST_NS =
+	settings.restNamespace || 'wp-dynamic-metafield/v1';
 
 /**
  * @param {string} source
@@ -50,14 +54,14 @@ function isOurSource( source ) {
 }
 
 const CONTEXT_OPTIONS = [
-	{ label: __( 'Publication (post)', 'dynamic-metafield' ), value: 'post' },
-	{ label: __( 'Options SCF', 'dynamic-metafield' ), value: 'option' },
-	{ label: __( 'Utilisateur (auteur)', 'dynamic-metafield' ), value: 'user' },
-	{ label: __( 'Terme', 'dynamic-metafield' ), value: 'term' },
+	{ label: __( 'Post', 'wp-dynamic-metafield' ), value: 'post' },
+	{ label: __( 'SCF Options', 'wp-dynamic-metafield' ), value: 'option' },
+	{ label: __( 'User (author)', 'wp-dynamic-metafield' ), value: 'user' },
+	{ label: __( 'Term', 'wp-dynamic-metafield' ), value: 'term' },
 ];
 
 const EMPTY_OPTION = {
-	label: __( '— Aucune liaison —', 'dynamic-metafield' ),
+	label: __( '— No binding —', 'wp-dynamic-metafield' ),
 	value: '',
 };
 
@@ -190,21 +194,21 @@ function AffixControls( { before, after, onBefore, onAfter, help } ) {
 	return (
 		<>
 			<TextControl
-				label={ __( 'Avant (préfixe)', 'dynamic-metafield' ) }
+				label={ __( 'Before (prefix)', 'wp-dynamic-metafield' ) }
 				value={ before }
 				onChange={ onBefore }
 				placeholder="https://"
 			/>
 			<TextControl
-				label={ __( 'Après (suffixe)', 'dynamic-metafield' ) }
+				label={ __( 'After (suffix)', 'wp-dynamic-metafield' ) }
 				value={ after }
 				onChange={ onAfter }
 				placeholder="/releases.atom"
 				help={
 					help ||
 					__(
-						'Ajouté autour de la valeur du champ, ex. https:// + champ + /releases.atom',
-						'dynamic-metafield'
+						'Wrapped around the field value, e.g. https:// + field + /releases.atom',
+						'wp-dynamic-metafield'
 					)
 				}
 			/>
@@ -231,11 +235,11 @@ function RssSettingsPanel( { attributes, setAttributes } ) {
 
 	return (
 		<PanelBody
-			title={ __( 'Options du flux RSS / Atom', 'dynamic-metafield' ) }
+			title={ __( 'RSS / Atom feed options', 'wp-dynamic-metafield' ) }
 			initialOpen={ true }
 		>
 			<RangeControl
-				label={ __( "Nombre d'éléments", 'dynamic-metafield' ) }
+				label={ __( 'Number of items', 'wp-dynamic-metafield' ) }
 				value={ itemsToShow }
 				onChange={ ( value ) =>
 					setAttributes( { itemsToShow: value } )
@@ -244,19 +248,19 @@ function RssSettingsPanel( { attributes, setAttributes } ) {
 				max={ 20 }
 			/>
 			<ToggleControl
-				label={ __( "Afficher l'auteur ou l'autrice", 'dynamic-metafield' ) }
+				label={ __( 'Display author', 'wp-dynamic-metafield' ) }
 				checked={ !! displayAuthor }
 				onChange={ ( value ) =>
 					setAttributes( { displayAuthor: value } )
 				}
 			/>
 			<ToggleControl
-				label={ __( 'Afficher la date', 'dynamic-metafield' ) }
+				label={ __( 'Display date', 'wp-dynamic-metafield' ) }
 				checked={ !! displayDate }
 				onChange={ ( value ) => setAttributes( { displayDate: value } ) }
 			/>
 			<ToggleControl
-				label={ __( "Afficher l'extrait", 'dynamic-metafield' ) }
+				label={ __( 'Display excerpt', 'wp-dynamic-metafield' ) }
 				checked={ !! displayExcerpt }
 				onChange={ ( value ) =>
 					setAttributes( { displayExcerpt: value } )
@@ -264,7 +268,7 @@ function RssSettingsPanel( { attributes, setAttributes } ) {
 			/>
 			{ displayExcerpt && (
 				<RangeControl
-					label={ __( "Longueur de l'extrait", 'dynamic-metafield' ) }
+					label={ __( 'Max excerpt words', 'wp-dynamic-metafield' ) }
 					value={ excerptLength }
 					onChange={ ( value ) =>
 						setAttributes( { excerptLength: value } )
@@ -275,8 +279,8 @@ function RssSettingsPanel( { attributes, setAttributes } ) {
 			) }
 			<ToggleControl
 				label={ __(
-					'Ouvrir les liens dans un nouvel onglet',
-					'dynamic-metafield'
+					'Open links in a new tab',
+					'wp-dynamic-metafield'
 				) }
 				checked={ !! openInNewTab }
 				onChange={ ( value ) =>
@@ -284,15 +288,15 @@ function RssSettingsPanel( { attributes, setAttributes } ) {
 				}
 			/>
 			<SelectControl
-				label={ __( 'Mise en page', 'dynamic-metafield' ) }
+				label={ __( 'Layout', 'wp-dynamic-metafield' ) }
 				value={ blockLayout }
 				options={ [
 					{
-						label: __( 'Liste', 'dynamic-metafield' ),
+						label: __( 'List', 'wp-dynamic-metafield' ),
 						value: 'list',
 					},
 					{
-						label: __( 'Grille', 'dynamic-metafield' ),
+						label: __( 'Grid', 'wp-dynamic-metafield' ),
 						value: 'grid',
 					},
 				] }
@@ -302,7 +306,7 @@ function RssSettingsPanel( { attributes, setAttributes } ) {
 			/>
 			{ blockLayout === 'grid' && (
 				<RangeControl
-					label={ __( 'Colonnes', 'dynamic-metafield' ) }
+					label={ __( 'Columns', 'wp-dynamic-metafield' ) }
 					value={ columns }
 					onChange={ ( value ) => setAttributes( { columns: value } ) }
 					min={ 2 }
@@ -416,7 +420,7 @@ function BindingPanel( {
 			postType,
 			taxonomy,
 		} );
-		apiFetch( { path: `/dynamic-metafield/v1/fields?${ qs.toString() }` } )
+		apiFetch( { path: `/${ REST_NS }/fields?${ qs.toString() }` } )
 			.then( ( res ) => {
 				if ( ! cancelled ) {
 					setFields( res.fields || [] );
@@ -428,8 +432,8 @@ function BindingPanel( {
 					setError(
 						err?.message ||
 							__(
-								'Impossible de charger les champs SCF.',
-								'dynamic-metafield'
+								'Unable to load SCF fields.',
+								'wp-dynamic-metafield'
 							)
 					);
 				}
@@ -456,14 +460,14 @@ function BindingPanel( {
 					qs.set( 'post_type', postType );
 				}
 				let res = await apiFetch( {
-					path: `/dynamic-metafield/v1/taxonomies?${ qs.toString() }`,
+					path: `/${ REST_NS }/taxonomies?${ qs.toString() }`,
 				} );
 				let list = res?.taxonomies || [];
 
 				// Fallback: no post type filter if scoped result is empty.
 				if ( ! list.length && postType ) {
 					res = await apiFetch( {
-						path: `/dynamic-metafield/v1/taxonomies`,
+						path: `/${ REST_NS }/taxonomies`,
 					} );
 					list = res?.taxonomies || [];
 				}
@@ -473,8 +477,8 @@ function BindingPanel( {
 					if ( ! list.length ) {
 						setTaxError(
 							__(
-								'Aucune taxonomie trouvée. Vérifiez que la taxonomie est enregistrée (show_ui) sur ce type de publication.',
-								'dynamic-metafield'
+								'No taxonomy found. Check that a taxonomy with an admin UI is registered for this post type.',
+								'wp-dynamic-metafield'
 							)
 						);
 					}
@@ -485,8 +489,8 @@ function BindingPanel( {
 					setTaxError(
 						err?.message ||
 							__(
-								'Impossible de charger les taxonomies.',
-								'dynamic-metafield'
+								'Unable to load taxonomies.',
+								'wp-dynamic-metafield'
 							)
 					);
 				}
@@ -779,7 +783,7 @@ function BindingPanel( {
 	const allFieldOptions = useMemo( () => {
 		const opts = [
 			{
-				label: __( '— Choisir un champ —', 'dynamic-metafield' ),
+				label: __( '— Choose a field —', 'wp-dynamic-metafield' ),
 				value: '',
 			},
 		];
@@ -797,7 +801,7 @@ function BindingPanel( {
 	const taxonomyOptions = useMemo( () => {
 		const opts = [
 			{
-				label: __( '— Choisir une taxonomie —', 'dynamic-metafield' ),
+				label: __( '— Choose a taxonomy —', 'wp-dynamic-metafield' ),
 				value: '',
 			},
 		];
@@ -814,7 +818,7 @@ function BindingPanel( {
 		const tax = ( taxonomies || [] ).find( ( t ) => t.name === showIfTaxonomy );
 		const opts = [
 			{
-				label: __( '— N’importe quel terme —', 'dynamic-metafield' ),
+				label: __( '— Any term —', 'wp-dynamic-metafield' ),
 				value: '',
 			},
 		];
@@ -830,7 +834,7 @@ function BindingPanel( {
 	const scfTaxonomyOptions = useMemo( () => {
 		const opts = [
 			{
-				label: __( '— Choisir —', 'dynamic-metafield' ),
+				label: __( '— Choose —', 'wp-dynamic-metafield' ),
 				value: '',
 			},
 		];
@@ -852,7 +856,7 @@ function BindingPanel( {
 	return (
 		<InspectorControls>
 			<PanelBody
-				title={ __( 'Liaison SCF', 'dynamic-metafield' ) }
+				title={ __( 'SCF Binding', 'wp-dynamic-metafield' ) }
 				initialOpen={ true }
 			>
 				{ error && (
@@ -861,14 +865,14 @@ function BindingPanel( {
 					</Notice>
 				) }
 				<SelectControl
-					label={ __( 'Contexte', 'dynamic-metafield' ) }
+					label={ __( 'Context', 'wp-dynamic-metafield' ) }
 					value={ currentContext }
 					options={ CONTEXT_OPTIONS }
 					onChange={ setScfContext }
 				/>
 				{ scfContext === 'term' && (
 					<SelectControl
-						label={ __( 'Taxonomie', 'dynamic-metafield' ) }
+						label={ __( 'Taxonomy', 'wp-dynamic-metafield' ) }
 						value={ taxonomy }
 						options={ scfTaxonomyOptions }
 						onChange={ setTaxonomy }
@@ -879,7 +883,7 @@ function BindingPanel( {
 				) : isButton ? (
 					<>
 						<SelectControl
-							label={ __( 'Lien du bouton (URL)', 'dynamic-metafield' ) }
+							label={ __( 'Button link (URL)', 'wp-dynamic-metafield' ) }
 							value={ urlKey }
 							options={ toOptions( urlFields ) }
 							onChange={ ( value ) =>
@@ -906,13 +910,13 @@ function BindingPanel( {
 									persistAffixes( 'url', urlBefore, v );
 								} }
 								help={ __(
-									'Ex. avant=https:// et après=/releases.atom pour un chemin GitHub.',
-									'dynamic-metafield'
+									'E.g. before=https:// and after=/releases.atom for a GitHub path.',
+									'wp-dynamic-metafield'
 								) }
 							/>
 						) }
 						<SelectControl
-							label={ __( 'Libellé du bouton', 'dynamic-metafield' ) }
+							label={ __( 'Button label', 'wp-dynamic-metafield' ) }
 							value={ textKey }
 							options={ toOptions( textFields ) }
 							onChange={ ( value ) =>
@@ -926,9 +930,9 @@ function BindingPanel( {
 							label={
 								isUrlBlock
 									? name === 'core/rss'
-										? __( 'Champ URL du flux RSS', 'dynamic-metafield' )
-										: __( 'Champ URL (embed / YouTube)', 'dynamic-metafield' )
-									: __( 'Champ SCF', 'dynamic-metafield' )
+										? __( 'RSS feed URL field', 'wp-dynamic-metafield' )
+										: __( 'URL field (embed / YouTube)', 'wp-dynamic-metafield' )
+									: __( 'SCF field', 'wp-dynamic-metafield' )
 							}
 							value={ currentKey }
 							options={ toOptions( compatible ) }
@@ -937,8 +941,8 @@ function BindingPanel( {
 								compatible.length
 									? undefined
 									: __(
-											'Aucun champ compatible pour ce bloc.',
-											'dynamic-metafield'
+											'No compatible field for this block.',
+											'wp-dynamic-metafield'
 									  )
 							}
 						/>
@@ -959,32 +963,32 @@ function BindingPanel( {
 					</>
 				) }
 				<SelectControl
-					label={ __( 'Condition d’affichage', 'dynamic-metafield' ) }
+					label={ __( 'Visibility condition', 'wp-dynamic-metafield' ) }
 					value={ showIfType || 'none' }
 					options={ [
 						{
-							label: __( 'Toujours visible', 'dynamic-metafield' ),
+							label: __( 'Always visible', 'wp-dynamic-metafield' ),
 							value: 'none',
 						},
 						{
-							label: __( 'Si champ SCF rempli', 'dynamic-metafield' ),
+							label: __( 'If SCF field is filled', 'wp-dynamic-metafield' ),
 							value: 'field',
 						},
 						{
-							label: __( 'Selon taxonomie / terme', 'dynamic-metafield' ),
+							label: __( 'By taxonomy / term', 'wp-dynamic-metafield' ),
 							value: 'taxonomy',
 						},
 					] }
 					onChange={ setShowIfType }
 					help={ __(
-						'Indépendant du lien / libellé liés. Utile pour afficher un bouton seulement sur certains contenus.',
-						'dynamic-metafield'
+						'Independent of bound link / label. Useful to show a button only on some content.',
+						'wp-dynamic-metafield'
 					) }
 				/>
 				{ showIfType === 'field' && (
 					<>
 						<SelectControl
-							label={ __( 'Champ à vérifier', 'dynamic-metafield' ) }
+							label={ __( 'Field to check', 'wp-dynamic-metafield' ) }
 							value={ showIfField }
 							options={ allFieldOptions }
 							onChange={ setShowIfField }
@@ -997,7 +1001,7 @@ function BindingPanel( {
 									fontSize: '12px',
 								} }
 							>
-								{ __( 'Contexte condition : ', 'dynamic-metafield' ) +
+								{ __( 'Condition context: ', 'wp-dynamic-metafield' ) +
 									( showIfContext || scfContext ) }
 							</p>
 						) }
@@ -1015,54 +1019,54 @@ function BindingPanel( {
 							</Notice>
 						) }
 						<SelectControl
-							label={ __( 'Taxonomie', 'dynamic-metafield' ) }
+							label={ __( 'Taxonomy', 'wp-dynamic-metafield' ) }
 							value={ showIfTaxonomy }
 							options={ taxonomyOptions }
 							onChange={ setShowIfTaxonomy }
 							help={
 								postType
 									? __(
-											'Taxonomies du type de contenu courant, puis les autres si besoin.',
-											'dynamic-metafield'
+											'Taxonomies for the current post type, then others if needed.',
+											'wp-dynamic-metafield'
 									  )
 									: __(
-											'Toutes les taxonomies avec interface d’administration.',
-											'dynamic-metafield'
+											'All taxonomies with an admin UI.',
+											'wp-dynamic-metafield'
 									  )
 							}
 						/>
 						<SelectControl
-							label={ __( 'Terme', 'dynamic-metafield' ) }
+							label={ __( 'Term', 'wp-dynamic-metafield' ) }
 							value={ showIfTerm }
 							options={ termOptions }
 							onChange={ setShowIfTerm }
 							help={
 								showIfTaxonomy && termOptions.length <= 1
 									? __(
-											'Aucun terme dans cette taxonomie pour l’instant — créez-en un dans l’admin.',
-											'dynamic-metafield'
+											'No terms in this taxonomy yet — create one in the admin.',
+											'wp-dynamic-metafield'
 									  )
 									: __(
-											'Laissez « n’importe quel terme » pour afficher dès qu’au moins un terme est assigné.',
-											'dynamic-metafield'
+											'Leave “any term” to show whenever at least one term is assigned.',
+											'wp-dynamic-metafield'
 									  )
 							}
 						/>
 						<SelectControl
-							label={ __( 'Règle', 'dynamic-metafield' ) }
+							label={ __( 'Rule', 'wp-dynamic-metafield' ) }
 							value={ showIfTaxOperator }
 							options={ [
 								{
 									label: __(
-										'Afficher si le terme est présent',
-										'dynamic-metafield'
+										'Show if the term is present',
+										'wp-dynamic-metafield'
 									),
 									value: 'has',
 								},
 								{
 									label: __(
-										'Afficher si le terme est absent',
-										'dynamic-metafield'
+										'Show if the term is absent',
+										'wp-dynamic-metafield'
 									),
 									value: 'not_has',
 								},
@@ -1072,18 +1076,18 @@ function BindingPanel( {
 					</>
 				) }
 				<ToggleControl
-					label={ __( 'Masquer si liaison vide', 'dynamic-metafield' ) }
+					label={ __( 'Hide if binding is empty', 'wp-dynamic-metafield' ) }
 					checked={ hideIfEmpty }
 					onChange={ setHideIfEmpty }
 					help={
 						isButton
 							? __(
-									'Masque le bouton si le lien ou libellé lié SCF est vide.',
-									'dynamic-metafield'
+									'Hides the button if the bound SCF link or label is empty.',
+									'wp-dynamic-metafield'
 							  )
 							: __(
-									'Masque le bloc si la valeur du champ lié (avant préfixe/suffixe) est vide.',
-									'dynamic-metafield'
+									'Hides the block if the bound field value (before prefix/suffix) is empty.',
+									'wp-dynamic-metafield'
 							  )
 					}
 				/>
@@ -1093,7 +1097,7 @@ function BindingPanel( {
 						isDestructive
 						onClick={ clearBinding }
 					>
-						{ __( 'Supprimer la liaison', 'dynamic-metafield' ) }
+						{ __( 'Remove binding', 'wp-dynamic-metafield' ) }
 					</Button>
 				) }
 			</PanelBody>
@@ -1119,10 +1123,10 @@ const withBindingPanel = createHigherOrderComponent( ( BlockEdit ) => {
 			</>
 		);
 	};
-}, 'withdmfBindingPanel' );
+}, 'withDmfBindingPanel' );
 
 addFilter(
 	'editor.BlockEdit',
-	'dynamic-metafield/with-binding-panel',
+	'wp-dynamic-metafield/with-binding-panel',
 	withBindingPanel
 );

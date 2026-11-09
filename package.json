@@ -1,7 +1,7 @@
 {
-	"name": "dynamic-metafield",
+	"name": "wp-dynamic-metafield",
 	"version": "1.0.0",
-	"description": "Liaison dynamique Gutenberg ↔ Secure Custom Fields",
+	"description": "Dynamically bind Gutenberg blocks to Secure Custom Fields",
 	"author": "Morglaf",
 	"license": "GPL-2.0-or-later",
 	"main": "build/index.js",

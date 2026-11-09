@@ -1,0 +1,231 @@
+{
+  "translation-revision-date": "2026-03-23 00:00+0000",
+  "generator": "wp-dynamic-metafield-_gen_i18n",
+  "source": "build/index.js",
+  "domain": "wp-dynamic-metafield",
+  "locale_data": {
+    "wp-dynamic-metafield": {
+      "": {
+        "domain": "wp-dynamic-metafield",
+        "lang": "de_DE",
+        "plural-forms": "nplurals=2; plural=(n != 1);"
+      },
+      "After (suffix)": [
+        "Danach (Suffix)"
+      ],
+      "All taxonomies with an admin UI.": [
+        "Alle Taxonomien mit Admin-Oberfläche."
+      ],
+      "Always visible": [
+        "Immer sichtbar"
+      ],
+      "Before (prefix)": [
+        "Davor (Präfix)"
+      ],
+      "Button label": [
+        "Button-Beschriftung"
+      ],
+      "Button link (URL)": [
+        "Button-Link (URL)"
+      ],
+      "By taxonomy / term": [
+        "Nach Taxonomie / Begriff"
+      ],
+      "Columns": [
+        "Spalten"
+      ],
+      "Condition context: ": [
+        "Bedingungskontext: "
+      ],
+      "Context": [
+        "Kontext"
+      ],
+      "Display author": [
+        "Autor anzeigen"
+      ],
+      "Display date": [
+        "Datum anzeigen"
+      ],
+      "Display excerpt": [
+        "Auszug anzeigen"
+      ],
+      "Dynamic Metafield requires Secure Custom Fields (or a compatible ACF API) to be active.": [
+        "Dynamic Metafield erfordert, dass Secure Custom Fields (oder eine kompatible ACF-API) aktiv ist."
+      ],
+      "Dynamic Metafield requires WordPress 6.7 or newer.": [
+        "Dynamic Metafield benötigt WordPress 6.7 oder neuer."
+      ],
+      "E.g. before=https:// and after=/releases.atom for a GitHub path.": [
+        "Z. B. before=https:// und after=/releases.atom für einen GitHub-Pfad."
+      ],
+      "Field to check": [
+        "Zu prüfendes Feld"
+      ],
+      "Flexible layout (optional)": [
+        "Flexibles Layout (optional)"
+      ],
+      "Grid": [
+        "Raster"
+      ],
+      "HTML tag": [
+        "HTML-Tag"
+      ],
+      "Hide if binding is empty": [
+        "Ausblenden, wenn Bindung leer ist"
+      ],
+      "Hides the block if the bound field value (before prefix/suffix) is empty.": [
+        "Blendet den Block aus, wenn der gebundene Feldwert (vor Präfix/Suffix) leer ist."
+      ],
+      "Hides the button if the bound SCF link or label is empty.": [
+        "Blendet den Button aus, wenn der gebundene SCF-Link oder das Label leer ist."
+      ],
+      "If SCF field is filled": [
+        "Wenn SCF-Feld ausgefüllt ist"
+      ],
+      "If set, only Flexible Content rows with this layout are rendered.": [
+        "Wenn gesetzt, werden nur Flexible-Content-Zeilen mit diesem Layout gerendert."
+      ],
+      "Independent of bound link / label. Useful to show a button only on some content.": [
+        "Unabhängig von gebundenem Link / Label. Nützlich, um einen Button nur bei bestimmten Inhalten anzuzeigen."
+      ],
+      "Layout": [
+        "Layout"
+      ],
+      "Leave “any term” to show whenever at least one term is assigned.": [
+        "Belassen Sie „beliebiger Begriff“, um anzuzeigen, sobald mindestens ein Begriff zugewiesen ist."
+      ],
+      "List": [
+        "Liste"
+      ],
+      "Loop over a Secure Custom Fields Repeater or Flexible Content field and render child blocks for each row.": [
+        "Schleife über ein SCF-Repeater- oder Flexible-Content-Feld und rendert Kindblöcke für jede Zeile."
+      ],
+      "Loop over a Secure Custom Fields Repeater or Flexible Content field.": [
+        "Schleife über ein Secure-Custom-Fields-Repeater- oder Flexible-Content-Feld."
+      ],
+      "Loopable field": [
+        "Schleifenfähiges Feld"
+      ],
+      "Max excerpt words": [
+        "Maximale Auszugswörter"
+      ],
+      "No compatible field for this block.": [
+        "Kein kompatibles Feld für diesen Block."
+      ],
+      "No taxonomy found. Check that a taxonomy with an admin UI is registered for this post type.": [
+        "Keine Taxonomie gefunden. Prüfen Sie, ob für diesen Beitragstyp eine Taxonomie mit Admin-UI registriert ist."
+      ],
+      "No terms in this taxonomy yet — create one in the admin.": [
+        "Noch keine Begriffe in dieser Taxonomie — legen Sie einen im Admin an."
+      ],
+      "Number of items": [
+        "Anzahl der Einträge"
+      ],
+      "Open links in a new tab": [
+        "Links in neuem Tab öffnen"
+      ],
+      "Post": [
+        "Beitrag (Post)"
+      ],
+      "RSS / Atom feed options": [
+        "RSS-/Atom-Feed-Optionen"
+      ],
+      "RSS feed URL field": [
+        "RSS-Feed-URL-Feld"
+      ],
+      "Remove binding": [
+        "Bindung entfernen"
+      ],
+      "Rule": [
+        "Regel"
+      ],
+      "SCF Binding": [
+        "SCF-Bindung"
+      ],
+      "SCF Field Loop": [
+        "SCF-Feldschleife"
+      ],
+      "SCF Field Loop (legacy)": [
+        "SCF-Feldschleife (Alt)"
+      ],
+      "SCF Loop": [
+        "SCF-Schleife"
+      ],
+      "SCF Options": [
+        "SCF-Optionen"
+      ],
+      "SCF field": [
+        "SCF-Feld"
+      ],
+      "SCF loop — choose a Repeater / Flexible field": [
+        "SCF-Schleife — wählen Sie ein Repeater-/Flexible-Feld"
+      ],
+      "SCF loop: ": [
+        "SCF-Schleife: "
+      ],
+      "Secure Custom Fields": [
+        "Secure Custom Fields"
+      ],
+      "Secure Custom Fields (legacy)": [
+        "Secure Custom Fields (Alt)"
+      ],
+      "Show if the term is absent": [
+        "Anzeigen, wenn der Begriff fehlt"
+      ],
+      "Show if the term is present": [
+        "Anzeigen, wenn der Begriff vorhanden ist"
+      ],
+      "Taxonomies for the current post type, then others if needed.": [
+        "Taxonomien des aktuellen Beitragstyps, dann andere bei Bedarf."
+      ],
+      "Taxonomy": [
+        "Taxonomie"
+      ],
+      "Term": [
+        "Begriff"
+      ],
+      "URL field (embed / YouTube)": [
+        "URL-Feld (Embed / YouTube)"
+      ],
+      "Unable to load SCF fields.": [
+        "SCF-Felder konnten nicht geladen werden."
+      ],
+      "Unable to load taxonomies.": [
+        "Taxonomien konnten nicht geladen werden."
+      ],
+      "User (author)": [
+        "Benutzer (Autor)"
+      ],
+      "Visibility condition": [
+        "Sichtbarkeitsbedingung"
+      ],
+      "Wrapped around the field value, e.g. https:// + field + /releases.atom": [
+        "Wird um den Feldwert gelegt, z. B. https:// + Feld + /releases.atom"
+      ],
+      "flexible": [
+        "Flexibel"
+      ],
+      "repeater": [
+        "Wiederholer"
+      ],
+      "— Any term —": [
+        "— Beliebiger Begriff —"
+      ],
+      "— Choose a field —": [
+        "— Feld wählen —"
+      ],
+      "— Choose a repeater / flexible field —": [
+        "— Repeater / Flexible-Feld wählen —"
+      ],
+      "— Choose a taxonomy —": [
+        "— Taxonomie wählen —"
+      ],
+      "— Choose —": [
+        "— Wählen —"
+      ],
+      "— No binding —": [
+        "— Keine Bindung —"
+      ]
+    }
+  }
+}

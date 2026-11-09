@@ -1,89 +1,112 @@
 # Dynamic Metafield
 
-Plugin WordPress open-source pour lier les blocs Gutenberg natifs aux champs **Secure Custom Fields** (API compatible ACF), via la **Block Bindings API**, un panneau **InspectorControls**, et un rendu serveur `render_block` (contexte Query Loop).
+WordPress plugin that binds native Gutenberg blocks to **Secure Custom Fields** (ACF-compatible API) via the **Block Bindings API**, an **InspectorControls** panel, and server-side `render_block` (Query Loop aware).
 
-## Prérequis
+**Author:** Morglaf  
+**Slug:** `wp-dynamic-metafield`  
+**License:** GPL-2.0-or-later  
+**Languages:** English (source), French, Spanish, German
+
+## Requirements
 
 - WordPress **6.7+**
-- Plugin **Secure Custom Fields** (ou ACF exposant `get_field` / `acf_get_field_groups`)
-- Node.js 18+ (pour compiler les assets éditeur)
+- **Secure Custom Fields** (or ACF exposing `get_field` / `acf_get_field_groups`)
+- Node.js 18+ (to build editor assets)
 
 ## Installation
 
-1. Copier ce dossier dans `wp-content/plugins/dynamic-metafield`
-2. Installer et compiler les assets :
+1. Copy this folder to `wp-content/plugins/wp-dynamic-metafield`
+2. Build assets:
 
 ```bash
 npm install
 npm run build
 ```
 
-3. Activer le plugin dans l’admin WordPress
+3. Activate the plugin in WordPress admin
 
-En développement : `npm start` (watch).
+Development watch mode: `npm start`.
 
-## Utilisation
+If your local git folder is still named `dai-dynamic-metafield`, rename it to `wp-dynamic-metafield` to match the plugin slug.
 
-### Préfixe / suffixe (Avant / Après)
+## Usage
 
-Sur une liaison, tu peux ajouter du texte **avant** et **après** la valeur du champ.
+### Before / After affixes
 
-Exemple : champ = `github.com/pseudo/app`
+On a binding, you can add text **before** and **after** the field value.
 
-- Avant : `https://`
-- Après : `/releases.atom`
+Example: field = `github.com/user/app`
 
-→ résultat : `https://github.com/pseudo/app/releases.atom`
+- Before: `https://`
+- After: `/releases.atom`
 
-Utile pour un bouton, un paragraphe, un flux **RSS**, ou un **embed YouTube**.
+→ `https://github.com/user/app/releases.atom`
 
-### Blocs supportés
+Useful for buttons, paragraphs, **RSS** feeds, or **YouTube** embeds.
 
-- Paragraphe, Titre, Image, Bouton
+### Supported blocks
+
+- Paragraph, Heading, Image, Button
 - **RSS** (`feedURL`)
-- **Contenu embarqué / YouTube** (`core/embed`)
+- **Embed / YouTube** (`core/embed`)
 
+1. Open content in the block editor
+2. Select a supported block
+3. In the sidebar, **SCF Binding** panel:
+   - Choose **context**: post, SCF options, user (author), or term
+   - Choose the **field** (including group subfields / repeater paths)
+   - Optional: **Hide if binding is empty**, visibility by filled field or taxonomy/term
+4. Save and preview on the front end
 
-1. Ouvrir un contenu dans l’éditeur de blocs
-2. Sélectionner un bloc **Paragraphe**, **Titre**, **Image** ou **Bouton**
-3. Dans la colonne latérale, panneau **Liaison SCF** :
-   - Choisir le **contexte** : publication, options SCF, utilisateur (auteur), ou terme
-   - Choisir le **champ** (y compris sous-champs de groupes / chemins repeater)
-   - Optionnel : activer **Masquer si vide**
-4. Enregistrer et prévisualiser le front
+Bindings are stored in `metadata.bindings` (portable, no proprietary meta).
 
-La liaison est stockée dans `metadata.bindings` (portable, sans meta propriétaire).
+### Repeater / Flexible — **SCF Field Loop**
 
-### Boucle Repeater / Flexible — bloc **SCF Field Loop**
+1. Insert **SCF Field Loop** (`wp-dynamic-metafield/loop`)
+2. Choose a **repeater** or **flexible content** field
+3. Place child blocks bound to **subfields** (relative paths)
+4. On the front end, the container iterates each row and renders children
 
-1. Insérer le bloc **SCF Field Loop** (`dynamic-metafield/loop`)
-2. Choisir un champ **repeater** ou **flexible content**
-3. Placer à l’intérieur des blocs liés aux **sous-champs** (chemins relatifs)
-4. Sur le front, le conteneur itère chaque ligne et rend les enfants
+Optional `layout` filter to keep only one Flexible Content layout.
 
-Filtre optionnel `layout` pour ne garder qu’un layout Flexible Content.
+Legacy block names `dynamic-metafield/loop` and `dai-dmf/loop` still render.
 
 ### Query Loop
 
-Le filtre `render_block` lit `$block['context']['postId']` : les liaisons fonctionnent correctement dans une boucle de requêtes.
+The `render_block` filter reads `$block['context']['postId']` so bindings work inside a query loop.
 
 ## Structure
 
 ```
-dynamic-metafield.php
+wp-dynamic-metafield.php
 includes/          # PHP (bindings, render, REST, assets, loop)
-blocks/loop/       # block.json du conteneur
-src/               # React / Gutenberg (source)
-build/             # JS compilé (généré)
+blocks/loop/       # block.json
+src/               # React / Gutenberg source
+build/             # Compiled JS (generated)
+languages/         # POT/PO/MO + editor JSON (en/fr/es/de)
+.wordpress-org/    # Directory icons & banners (SVN /assets, not in zip)
 ```
 
-## API REST
+## REST API
 
-- `GET /wp-json/dynamic-metafield/v1/fields?scf_context=post&post_id=123&post_type=post`
-- `GET /wp-json/dynamic-metafield/v1/values?scf_context=option`
+- `GET /wp-json/wp-dynamic-metafield/v1/fields?scf_context=post&post_id=123&post_type=post`
+- `GET /wp-json/wp-dynamic-metafield/v1/values?scf_context=option`
+- `GET /wp-json/wp-dynamic-metafield/v1/taxonomies?post_type=post`
 
-Capability requise : `edit_posts`.
+Legacy namespaces `dynamic-metafield/v1` and `dai-dmf/v1` remain registered. Capability: `edit_posts`.
 
-## Licence
+## Packaging
 
-GPL-2.0-or-later
+Local zip (gitignored script):
+
+```powershell
+.\make-zip.ps1
+```
+
+The zip includes `src/`, `package.json`, `package-lock.json`, `build/`, and `languages/` for WordPress.org Guideline 4.
+
+WordPress.org SVN assets (icons/banners) live in `.wordpress-org/` and are uploaded to the SVN `/assets` folder, not inside the plugin zip.
+
+## License
+
+GPL-2.0-or-later — see [LICENSE](LICENSE).

@@ -13,7 +13,15 @@ import {
 const settings =
 	typeof window !== 'undefined' && window.dmfSettings
 		? window.dmfSettings
-		: { source: 'dynamic-metafield/scf', restUrl: '', postId: 0 };
+		: {
+				source: 'wp-dynamic-metafield/scf',
+				restNamespace: 'wp-dynamic-metafield/v1',
+				restUrl: '',
+				postId: 0,
+		  };
+
+const REST_NS =
+	settings.restNamespace || 'wp-dynamic-metafield/v1';
 
 let valuesCache = { key: '', data: null, promise: null };
 
@@ -38,7 +46,7 @@ function loadValues( params ) {
 		key,
 		data: null,
 		promise: apiFetch( {
-			path: `/dynamic-metafield/v1/values?${ qs.toString() }`,
+			path: `/${ REST_NS }/values?${ qs.toString() }`,
 		} ).then( ( res ) => {
 			valuesCache.data = res.values || {};
 			valuesCache.promise = null;
@@ -140,17 +148,22 @@ function buildSourceConfig( label ) {
  * Register the bindings source in the editor.
  */
 export function registerScfBindingsSource() {
-	const primary = settings.source || 'dynamic-metafield/scf';
+	const primary = settings.source || 'wp-dynamic-metafield/scf';
+	const legacy = [ 'dynamic-metafield/scf', 'dai-dmf/scf' ];
+
 	registerBlockBindingsSource( {
 		name: primary,
 		...buildSourceConfig( 'Secure Custom Fields' ),
 	} );
-	if ( primary !== 'dai-dmf/scf' ) {
-		registerBlockBindingsSource( {
-			name: 'dai-dmf/scf',
-			...buildSourceConfig( 'Secure Custom Fields (legacy)' ),
-		} );
-	}
+
+	legacy.forEach( ( name ) => {
+		if ( name !== primary ) {
+			registerBlockBindingsSource( {
+				name,
+				...buildSourceConfig( 'Secure Custom Fields (legacy)' ),
+			} );
+		}
+	} );
 
 	prefetchValues( 'post' );
 }

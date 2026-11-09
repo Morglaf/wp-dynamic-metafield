@@ -5,6 +5,7 @@
 	opacity: 0.75;
 }
 
+.wp-block-wp-dynamic-metafield-loop,
 .wp-block-dynamic-metafield-loop {
 	border: 1px dashed #949494;
 	padding: 1rem;

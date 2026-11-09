@@ -1,13 +1,17 @@
 <?php
 /**
  * Plugin Name:       Dynamic Metafield
- * Description:       Lie dynamiquement les blocs Gutenberg aux champs Secure Custom Fields (Block Bindings + render_block).
+ * Plugin URI:        https://wordpress.org/plugins/wp-dynamic-metafield/
+ * Description:       Dynamically bind Gutenberg blocks to Secure Custom Fields (Block Bindings + render_block).
  * Version:           1.0.0
  * Requires at least: 6.7
  * Requires PHP:      7.4
  * Author:            Morglaf
- * Text Domain:       dynamic-metafield
+ * Author URI:        https://profiles.wordpress.org/morglaf/
+ * Text Domain:       wp-dynamic-metafield
+ * Domain Path:       /languages
  * License:           GPL-2.0-or-later
+ * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package DynamicMetafield
  */
@@ -18,8 +22,11 @@ define( 'DMF_VERSION', '1.0.0' );
 define( 'DMF_FILE', __FILE__ );
 define( 'DMF_PATH', plugin_dir_path( __FILE__ ) );
 define( 'DMF_URL', plugin_dir_url( __FILE__ ) );
-define( 'DMF_SOURCE', 'dynamic-metafield/scf' );
-/** @deprecated Legacy source name kept for existing content. */
+define( 'DMF_TEXTDOMAIN', 'wp-dynamic-metafield' );
+define( 'DMF_SOURCE', 'wp-dynamic-metafield/scf' );
+/** @deprecated Kept for content saved as dynamic-metafield/scf. */
+define( 'DMF_SOURCE_LEGACY_DM', 'dynamic-metafield/scf' );
+/** @deprecated Kept for content saved as dai-dmf/scf. */
 define( 'DMF_SOURCE_LEGACY', 'dai-dmf/scf' );
 
 /**
@@ -29,8 +36,24 @@ define( 'DMF_SOURCE_LEGACY', 'dai-dmf/scf' );
  * @return bool
  */
 function dmf_is_our_source( $source ) {
-	return in_array( $source, array( DMF_SOURCE, DMF_SOURCE_LEGACY ), true );
+	return in_array(
+		$source,
+		array( DMF_SOURCE, DMF_SOURCE_LEGACY_DM, DMF_SOURCE_LEGACY ),
+		true
+	);
 }
+
+/**
+ * Load translations.
+ */
+function dmf_load_textdomain() {
+	load_plugin_textdomain(
+		DMF_TEXTDOMAIN,
+		false,
+		dirname( plugin_basename( DMF_FILE ) ) . '/languages'
+	);
+}
+add_action( 'init', 'dmf_load_textdomain' );
 
 /**
  * Bootstrap.
@@ -68,7 +91,7 @@ function dmf_notice_wp_version() {
 		return;
 	}
 	echo '<div class="notice notice-error"><p>';
-	echo esc_html__( 'Dynamic Metafield requires WordPress 6.7 or newer.', 'dynamic-metafield' );
+	echo esc_html__( 'Dynamic Metafield requires WordPress 6.7 or newer.', 'wp-dynamic-metafield' );
 	echo '</p></div>';
 }
 
@@ -80,6 +103,6 @@ function dmf_notice_scf_missing() {
 		return;
 	}
 	echo '<div class="notice notice-error"><p>';
-	echo esc_html__( 'Dynamic Metafield requires Secure Custom Fields (or a compatible ACF API) to be active.', 'dynamic-metafield' );
+	echo esc_html__( 'Dynamic Metafield requires Secure Custom Fields (or a compatible ACF API) to be active.', 'wp-dynamic-metafield' );
 	echo '</p></div>';
 }

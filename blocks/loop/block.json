@@ -1,13 +1,13 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "dynamic-metafield/loop",
+	"name": "wp-dynamic-metafield/loop",
 	"title": "SCF Field Loop",
 	"category": "theme",
 	"icon": "update",
-	"description": "Boucle sur un champ Repeater ou Flexible Content SCF et affiche les blocs enfants pour chaque ligne.",
+	"description": "Loop over a Secure Custom Fields Repeater or Flexible Content field and render child blocks for each row.",
 	"keywords": ["scf", "acf", "repeater", "flexible", "loop", "metafield"],
-	"textdomain": "dynamic-metafield",
+	"textdomain": "wp-dynamic-metafield",
 	"attributes": {
 		"field": {
 			"type": "string",

@@ -10,7 +10,7 @@ namespace DynamicMetafield;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Registers dynamic-metafield/scf bindings source + extra bindable attributes.
+ * Registers wp-dynamic-metafield/scf bindings source + extra bindable attributes.
  */
 class Bindings_Source {
 
@@ -47,21 +47,22 @@ class Bindings_Source {
 			return;
 		}
 
-		register_block_bindings_source(
-			DMF_SOURCE,
-			array(
-				'label'              => __( 'Secure Custom Fields', 'dynamic-metafield' ),
-				'get_value_callback' => array( __CLASS__, 'get_value' ),
-				'uses_context'       => array( 'postId', 'postType' ),
-			)
+		$sources = array(
+			DMF_SOURCE => __( 'Secure Custom Fields', 'wp-dynamic-metafield' ),
 		);
 
-		// Keep legacy source so existing content with dai-dmf/scf still resolves.
-		if ( DMF_SOURCE_LEGACY !== DMF_SOURCE ) {
+		if ( DMF_SOURCE_LEGACY_DM !== DMF_SOURCE ) {
+			$sources[ DMF_SOURCE_LEGACY_DM ] = __( 'Secure Custom Fields (legacy)', 'wp-dynamic-metafield' );
+		}
+		if ( DMF_SOURCE_LEGACY !== DMF_SOURCE && DMF_SOURCE_LEGACY !== DMF_SOURCE_LEGACY_DM ) {
+			$sources[ DMF_SOURCE_LEGACY ] = __( 'Secure Custom Fields (legacy)', 'wp-dynamic-metafield' );
+		}
+
+		foreach ( $sources as $name => $label ) {
 			register_block_bindings_source(
-				DMF_SOURCE_LEGACY,
+				$name,
 				array(
-					'label'              => __( 'Secure Custom Fields (legacy)', 'dynamic-metafield' ),
+					'label'              => $label,
 					'get_value_callback' => array( __CLASS__, 'get_value' ),
 					'uses_context'       => array( 'postId', 'postType' ),
 				)
