@@ -3,6 +3,7 @@ build/
 dist/
 *.zip
 make-zip.ps1
+release.ps1
 *.log
 .DS_Store
 npm-debug.log*
